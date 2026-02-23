@@ -23,11 +23,10 @@ export default async function Home() {
 
       <main className="container mx-auto px-6 py-20 text-center">
         <h2 className="text-5xl font-bold mb-6">
-          Connecting Families Together
+          Find Your Perfect Home in Cameroon
         </h2>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Find trusted family-friendly accommodations and connect with hosts who
-          understand your needs.
+          Discover trusted property rentals across Cameroon. From Douala to Yaoundé, find your ideal accommodation.
         </p>
         <Link
           href="/auth"

@@ -64,7 +64,7 @@ export default function NewListingPage() {
             type="text"
             required
             className="w-full px-4 py-2 border rounded-lg"
-            placeholder="City, Country"
+            placeholder="e.g., Douala, Yaoundé, Bafoussam"
           />
         </div>
         <div className="grid grid-cols-3 gap-4">
@@ -100,7 +100,7 @@ export default function NewListingPage() {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Price per Night ($)</label>
+          <label className="block text-sm font-medium mb-2">Price per Night (XAF)</label>
           <input
             name="price_per_night"
             type="number"

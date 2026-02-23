@@ -21,7 +21,7 @@ export default async function BookingsPage() {
                 {format(new Date(booking.check_out), "MMM dd, yyyy")}
               </p>
               <p className="text-blue-600 font-bold mt-2">
-                ${booking.total_price}
+                {booking.total_price.toLocaleString()} XAF
               </p>
               <span
                 className={`inline-block mt-2 px-3 py-1 rounded text-sm ${

@@ -36,7 +36,7 @@ export default async function FavoritesPage() {
                   {fav.listings.location}
                 </p>
                 <p className="text-blue-600 font-bold">
-                  ${fav.listings.price_per_night}/night
+                  {fav.listings.price_per_night.toLocaleString()} XAF/night
                 </p>
               </div>
             </Link>

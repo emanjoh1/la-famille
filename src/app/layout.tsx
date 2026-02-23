@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "La Famille",
-  description: "La Famille - Connecting families together",
+  title: "La Famille - Property Rentals in Cameroon",
+  description: "Find and rent properties across Cameroon - Douala, Yaoundé, and beyond",
 };
 
 export default function RootLayout({

@@ -29,7 +29,7 @@ export default async function ExplorePage() {
               <h3 className="font-semibold text-lg mb-2">{listing.title}</h3>
               <p className="text-gray-600 text-sm mb-2">{listing.location}</p>
               <p className="text-blue-600 font-bold">
-                ${listing.price_per_night}/night
+                {listing.price_per_night.toLocaleString()} XAF/night
               </p>
             </div>
           </Link>
