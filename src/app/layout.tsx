@@ -24,7 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      publishableKey="pk_test_cHJlY2lvdXMtY293LTM1LmNsZXJrLmFjY291bnRzLmRldiQ"
+      secretKey="sk_test_aRpPOccMixlOvWwXhZM4z9omkYp8XBf5nCD1ab7njM"
+    >
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
