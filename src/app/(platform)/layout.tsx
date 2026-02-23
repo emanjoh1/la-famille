@@ -8,29 +8,29 @@ export default function PlatformLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b">
+      <nav className="sticky top-0 bg-white border-b z-50">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/explore" className="text-2xl font-bold text-blue-600">
+          <Link href="/explore" className="text-2xl font-bold text-rose-500">
             La Famille
           </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/explore" className="hover:text-blue-600">
+          <div className="flex items-center gap-8">
+            <Link href="/explore" className="text-gray-700 hover:text-gray-900 font-medium">
               Explore
             </Link>
-            <Link href="/bookings" className="hover:text-blue-600">
-              Bookings
+            <Link href="/bookings" className="text-gray-700 hover:text-gray-900 font-medium">
+              Trips
             </Link>
-            <Link href="/favorites" className="hover:text-blue-600">
-              Favorites
+            <Link href="/favorites" className="text-gray-700 hover:text-gray-900 font-medium">
+              Wishlists
             </Link>
-            <Link href="/host/listings" className="hover:text-blue-600">
+            <Link href="/host/listings" className="text-gray-700 hover:text-gray-900 font-medium">
               Host
             </Link>
-            <UserButton />
+            <UserButton afterSignOutUrl="/" />
           </div>
         </div>
       </nav>
-      <main>{children}</main>
+      <main className="pb-16">{children}</main>
     </div>
   );
 }

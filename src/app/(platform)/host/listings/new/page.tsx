@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createListing } from "@/actions/listings";
 import { useUploadThing } from "@/lib/uploadthing";
+import { Upload } from "lucide-react";
 
 export default function NewListingPage() {
   const router = useRouter();
@@ -34,101 +35,115 @@ export default function NewListingPage() {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">Create New Listing</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+    <div className="container mx-auto px-6 py-8 max-w-3xl">
+      <h1 className="text-3xl font-semibold mb-8">List your property</h1>
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div>
-          <label className="block text-sm font-medium mb-2">Title</label>
+          <label className="block text-lg font-medium mb-3">Property title</label>
           <input
             name="title"
             type="text"
             required
-            className="w-full px-4 py-2 border rounded-lg"
-            placeholder="Beautiful family home..."
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            placeholder="Beautiful apartment in Douala"
           />
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-lg font-medium mb-3">Description</label>
           <textarea
             name="description"
             required
-            className="w-full px-4 py-2 border rounded-lg"
-            rows={4}
-            placeholder="Describe your property..."
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+            rows={5}
+            placeholder="Tell guests about your property..."
           />
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-2">Location</label>
+          <label className="block text-lg font-medium mb-3">Location</label>
           <input
             name="location"
             type="text"
             required
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
             placeholder="e.g., Douala, Yaoundé, Bafoussam"
           />
         </div>
+
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Bedrooms</label>
+            <label className="block text-lg font-medium mb-3">Bedrooms</label>
             <input
               name="bedrooms"
               type="number"
               required
               min="1"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Bathrooms</label>
+            <label className="block text-lg font-medium mb-3">Bathrooms</label>
             <input
               name="bathrooms"
               type="number"
               required
               min="1"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Max Guests</label>
+            <label className="block text-lg font-medium mb-3">Guests</label>
             <input
               name="max_guests"
               type="number"
               required
               min="1"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
             />
           </div>
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-2">Price per Night (XAF)</label>
+          <label className="block text-lg font-medium mb-3">Price per night (XAF)</label>
           <input
             name="price_per_night"
             type="number"
             required
             min="1"
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
           />
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-2">Images</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="w-full px-4 py-2 border rounded-lg"
-          />
+          <label className="block text-lg font-medium mb-3">Photos</label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-rose-500 transition">
+            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+            />
+            <label htmlFor="image-upload" className="cursor-pointer">
+              <span className="text-rose-500 font-medium">Upload photos</span>
+              <p className="text-gray-600 text-sm mt-2">or drag and drop</p>
+            </label>
+          </div>
           {uploading && <p className="text-sm text-gray-600 mt-2">Uploading...</p>}
           {images.length > 0 && (
-            <p className="text-sm text-green-600 mt-2">{images.length} images uploaded</p>
+            <p className="text-sm text-green-600 mt-2">{images.length} photos uploaded</p>
           )}
         </div>
+
         <button
           type="submit"
           disabled={uploading}
-          className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+          className="w-full py-4 bg-rose-500 text-white rounded-lg hover:bg-rose-600 disabled:bg-gray-400 font-medium text-lg transition"
         >
-          Create Listing
+          Publish listing
         </button>
       </form>
     </div>
