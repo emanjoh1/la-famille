@@ -19,7 +19,7 @@ frontend:
         - env | grep -e RESEND_FROM_EMAIL >> .env.production
         - npm run build
   artifacts:
-    baseDirectory: .next
+    baseDirectory: .next/standalone
     files:
       - "**/*"
   cache:
