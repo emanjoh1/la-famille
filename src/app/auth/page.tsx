@@ -1,15 +1,22 @@
 "use client";
 
 import { SignIn, SignUp, useUser } from "@clerk/nextjs";
-import { useState } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
 
-  if (isSignedIn) {
-    redirect("/");
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (!isLoaded || isSignedIn) {
+    return null;
   }
 
   return (
