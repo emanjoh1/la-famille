@@ -3,13 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd la-famille
         - nvm install 20
         - nvm use 20
         - npm ci
     build:
       commands:
-        - cd la-famille
         - env | grep -e NEXT_PUBLIC_ >> .env.production
         - env | grep -e CLERK_SECRET_KEY >> .env.production
         - env | grep -e SUPABASE_SERVICE_ROLE_KEY >> .env.production
@@ -21,10 +19,10 @@ frontend:
         - env | grep -e RESEND_FROM_EMAIL >> .env.production
         - npm run build
   artifacts:
-    baseDirectory: la-famille/.next/standalone
+    baseDirectory: .next/standalone
     files:
       - "**/*"
   cache:
     paths:
-      - la-famille/node_modules/**/*
-      - la-famille/.next/cache/**/*
+      - node_modules/**/*
+      - .next/cache/**/*
