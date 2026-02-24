@@ -21,7 +21,7 @@ export async function createListing(formData: FormData) {
     max_guests: Number(formData.get("max_guests")),
     amenities: JSON.parse(formData.get("amenities") as string),
     images: JSON.parse(formData.get("images") as string),
-    status: "pending_review" as const, // host submits for review
+    status: "pending_review" as const,
   };
 
   const { data, error } = await supabaseAdmin
@@ -30,7 +30,10 @@ export async function createListing(formData: FormData) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error("Supabase error:", error);
+    throw new Error(error.message || "Failed to create listing");
+  }
 
   revalidatePath("/host/listings");
   return data;

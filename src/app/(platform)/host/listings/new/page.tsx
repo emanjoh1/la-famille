@@ -80,6 +80,7 @@ export default function NewListingPage() {
       await createListing(formData);
       setSubmitted(true);
     } catch (err) {
+      console.error("Submit error:", err);
       const msg = err instanceof Error ? err.message : "Something went wrong.";
       setError(msg);
     } finally {
