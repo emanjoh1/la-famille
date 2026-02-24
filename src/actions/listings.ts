@@ -35,6 +35,17 @@ export async function createListing(formData: FormData) {
     throw new Error(error.message || "Failed to create listing");
   }
 
+  // Send notification email to admin
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/health`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listingId: data.id, title: listing.title }),
+    });
+  } catch (e) {
+    console.error("Failed to send admin notification:", e);
+  }
+
   revalidatePath("/host/listings");
   return data;
 }
