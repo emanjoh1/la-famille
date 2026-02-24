@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
@@ -100,9 +100,15 @@ export async function getUserListings() {
 // ─── Admin actions ─────────────────────────────────────────────
 
 async function assertAdmin() {
-  const { userId, sessionClaims } = await auth();
+  const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role;
+
+  // Fetch metadata directly from Clerk — more reliable than sessionClaims
+  // because publicMetadata is not included in the JWT by default.
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
+  const role = user.publicMetadata?.role as string | undefined;
+
   if (role !== "admin") throw new Error("Forbidden: admin only");
   return userId;
 }

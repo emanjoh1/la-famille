@@ -1,21 +1,19 @@
 import { getAllListingsAdmin } from "@/actions/listings";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import AdminActions from "./AdminActions";
 
 export default async function AdminPage() {
-  // Server-side admin guard
-  const { userId, sessionClaims } = await auth();
-  console.log("Admin page - userId:", userId);
-  console.log("Admin page - role:", (sessionClaims?.publicMetadata as { role?: string })?.role);
-  
+  const { userId } = await auth();
   if (!userId) redirect("/auth");
-  const role = (sessionClaims?.publicMetadata as { role?: string })?.role;
-  if (role !== "admin") {
-    console.log("Not admin, redirecting to /explore");
-    redirect("/explore");
-  }
+
+  // Read publicMetadata directly from Clerk (not from JWT session claims,
+  // which don't include publicMetadata unless the session token is customised).
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
+  const role = user.publicMetadata?.role as string | undefined;
+  if (role !== "admin") redirect("/explore");
 
   const listings = await getAllListingsAdmin();
 
