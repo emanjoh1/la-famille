@@ -25,7 +25,7 @@ export async function createBooking(data: {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to create booking");
 
   revalidatePath("/bookings");
   return result;
@@ -62,7 +62,7 @@ export async function updateBookingStatus(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to update booking");
 
   revalidatePath("/bookings");
   return data;

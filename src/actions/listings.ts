@@ -75,7 +75,7 @@ export async function getListing(id: string) {
     .eq("id", id)
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Listing not found");
   return data;
 }
 
@@ -155,7 +155,7 @@ export async function approveListing(listingId: string) {
     .update({ status: "approved", rejection_reason: null })
     .eq("id", listingId);
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to approve listing");
 
   revalidatePath("/admin");
   revalidatePath("/explore");
@@ -174,7 +174,7 @@ export async function rejectListing(listingId: string, reason?: string) {
     })
     .eq("id", listingId);
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to reject listing");
 
   revalidatePath("/admin");
   revalidatePath("/host/listings");

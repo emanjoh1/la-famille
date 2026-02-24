@@ -18,7 +18,7 @@ export async function sendMessage(conversationId: string, content: string) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to send message");
 
   revalidatePath(`/messages/${conversationId}`);
   return data;
@@ -31,7 +31,7 @@ export async function getConversation(conversationId: string) {
     .eq("id", conversationId)
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Conversation not found");
   return data;
 }
 
@@ -42,7 +42,7 @@ export async function getMessages(conversationId: string) {
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
-  if (error) throw error;
+  if (error) throw new Error(error.message || "Failed to load messages");
   return data;
 }
 
