@@ -110,7 +110,16 @@ UPDATE listings SET status = 'approved' WHERE status = 'pending_review';
 -- Run this entire block in your Supabase SQL Editor.
 -- =============================================================
 
--- Step 1: Drop ALL RLS policies on affected tables (any name)
+-- Step 1: Drop foreign key constraints referencing auth.users(id)
+-- (Postgres can't change UUID → TEXT while an FK to a UUID column exists)
+ALTER TABLE listings      DROP CONSTRAINT IF EXISTS listings_user_id_fkey;
+ALTER TABLE bookings      DROP CONSTRAINT IF EXISTS bookings_user_id_fkey;
+ALTER TABLE favorites     DROP CONSTRAINT IF EXISTS favorites_user_id_fkey;
+ALTER TABLE conversations DROP CONSTRAINT IF EXISTS conversations_host_id_fkey;
+ALTER TABLE conversations DROP CONSTRAINT IF EXISTS conversations_guest_id_fkey;
+ALTER TABLE messages      DROP CONSTRAINT IF EXISTS messages_sender_id_fkey;
+
+-- Step 2: Drop ALL RLS policies on affected tables (any name)
 DO $$
 DECLARE
   r RECORD;
@@ -125,14 +134,14 @@ BEGIN
   END LOOP;
 END $$;
 
--- Step 2: Drop dependent indexes (recreated below)
+-- Step 3: Drop dependent indexes (recreated below)
 DROP INDEX IF EXISTS idx_listings_user_id;
 DROP INDEX IF EXISTS idx_bookings_user_id;
 DROP INDEX IF EXISTS idx_favorites_user_id;
 DROP INDEX IF EXISTS idx_conversations_host_id;
 DROP INDEX IF EXISTS idx_conversations_guest_id;
 
--- Step 3: Alter column types UUID → TEXT
+-- Step 4: Alter column types UUID → TEXT
 ALTER TABLE listings
   ALTER COLUMN user_id TYPE TEXT USING user_id::text;
 
@@ -154,14 +163,14 @@ ALTER TABLE conversations
 ALTER TABLE messages
   ALTER COLUMN sender_id TYPE TEXT USING sender_id::text;
 
--- Step 4: Recreate permissive RLS policies
+-- Step 5: Recreate permissive RLS policies
 CREATE POLICY "Allow all on listings"      ON listings      FOR ALL USING (true);
 CREATE POLICY "Allow all on bookings"      ON bookings      FOR ALL USING (true);
 CREATE POLICY "Allow all on favorites"     ON favorites     FOR ALL USING (true);
 CREATE POLICY "Allow all on conversations" ON conversations FOR ALL USING (true);
 CREATE POLICY "Allow all on messages"      ON messages      FOR ALL USING (true);
 
--- Step 5: Recreate performance indexes
+-- Step 6: Recreate performance indexes
 CREATE INDEX IF NOT EXISTS idx_listings_user_id       ON listings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id       ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id      ON favorites(user_id);
