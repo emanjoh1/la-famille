@@ -14,8 +14,13 @@ export async function createBooking(data: {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
+  const checkIn = new Date(data.check_in);
+  const checkOut = new Date(data.check_out);
+  const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+
   const booking = {
     ...data,
+    nights,
     user_id: userId,
     status: "pending" as const,
   };
