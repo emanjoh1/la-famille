@@ -103,25 +103,43 @@ UPDATE listings SET status = 'approved' WHERE status = 'pending_review';
 -- are NOT valid UUIDs. If your tables were created with UUID type
 -- for these columns, every booking / listing / message write will
 -- fail with "invalid input syntax for type uuid".
--- Run this block in your Supabase SQL Editor.
+--
+-- NOTE: Postgres refuses to ALTER a column that any RLS policy
+-- depends on. Step 1 dynamically drops ALL policies on the five
+-- affected tables, Step 4 puts back simple "allow all" policies.
+-- Run this entire block in your Supabase SQL Editor.
 -- =============================================================
 
--- Drop dependent indexes first (safe — we recreate them below)
+-- Step 1: Drop ALL RLS policies on affected tables (any name)
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN
+    SELECT policyname, tablename
+    FROM   pg_policies
+    WHERE  schemaname = 'public'
+      AND  tablename  IN ('listings','bookings','favorites','conversations','messages')
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %I', r.policyname, r.tablename);
+  END LOOP;
+END $$;
+
+-- Step 2: Drop dependent indexes (recreated below)
 DROP INDEX IF EXISTS idx_listings_user_id;
 DROP INDEX IF EXISTS idx_bookings_user_id;
 DROP INDEX IF EXISTS idx_favorites_user_id;
 DROP INDEX IF EXISTS idx_conversations_host_id;
 DROP INDEX IF EXISTS idx_conversations_guest_id;
 
--- listings
+-- Step 3: Alter column types UUID → TEXT
 ALTER TABLE listings
   ALTER COLUMN user_id TYPE TEXT USING user_id::text;
 
--- bookings
 ALTER TABLE bookings
   ALTER COLUMN user_id TYPE TEXT USING user_id::text;
 
--- favorites  (has a UNIQUE constraint — drop + recreate)
+-- favorites has a UNIQUE constraint — drop + recreate around the ALTER
 ALTER TABLE favorites
   DROP CONSTRAINT IF EXISTS favorites_user_id_listing_id_key;
 ALTER TABLE favorites
@@ -129,19 +147,24 @@ ALTER TABLE favorites
 ALTER TABLE favorites
   ADD CONSTRAINT favorites_user_id_listing_id_key UNIQUE (user_id, listing_id);
 
--- conversations
 ALTER TABLE conversations
   ALTER COLUMN host_id TYPE TEXT USING host_id::text,
   ALTER COLUMN guest_id TYPE TEXT USING guest_id::text;
 
--- messages
 ALTER TABLE messages
   ALTER COLUMN sender_id TYPE TEXT USING sender_id::text;
 
--- Recreate the performance indexes
-CREATE INDEX IF NOT EXISTS idx_listings_user_id      ON listings(user_id);
-CREATE INDEX IF NOT EXISTS idx_bookings_user_id      ON bookings(user_id);
-CREATE INDEX IF NOT EXISTS idx_favorites_user_id     ON favorites(user_id);
-CREATE INDEX IF NOT EXISTS idx_conversations_host_id ON conversations(host_id);
+-- Step 4: Recreate permissive RLS policies
+CREATE POLICY "Allow all on listings"      ON listings      FOR ALL USING (true);
+CREATE POLICY "Allow all on bookings"      ON bookings      FOR ALL USING (true);
+CREATE POLICY "Allow all on favorites"     ON favorites     FOR ALL USING (true);
+CREATE POLICY "Allow all on conversations" ON conversations FOR ALL USING (true);
+CREATE POLICY "Allow all on messages"      ON messages      FOR ALL USING (true);
+
+-- Step 5: Recreate performance indexes
+CREATE INDEX IF NOT EXISTS idx_listings_user_id       ON listings(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_user_id       ON bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user_id      ON favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_host_id  ON conversations(host_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_guest_id ON conversations(guest_id);
 -- =============================================================
