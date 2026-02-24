@@ -57,23 +57,30 @@ export default async function BookingsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between mb-1 gap-4">
                   <h3 className="font-semibold text-[#222222] text-lg truncate">
-                    {booking.listings?.title}
+                    {booking.listings?.title ?? "Listing"}
                   </h3>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                      STATUS_STYLES[booking.status] ?? STATUS_STYLES.pending
+                      STATUS_STYLES[booking.status ?? "pending"] ?? STATUS_STYLES.pending
                     }`}
                   >
-                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                    {booking.status
+                      ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
+                      : "Pending"}
                   </span>
                 </div>
-                <p className="text-[#717171] text-sm mb-3">{booking.listings?.location}</p>
+                <p className="text-[#717171] text-sm mb-3">{booking.listings?.location ?? ""}</p>
                 <p className="text-sm text-[#222222]">
-                  {format(new Date(booking.check_in), "MMM d")} –{" "}
-                  {format(new Date(booking.check_out), "MMM d, yyyy")}
+                  {booking.check_in
+                    ? format(new Date(booking.check_in), "MMM d")
+                    : "—"}{" "}
+                  –{" "}
+                  {booking.check_out
+                    ? format(new Date(booking.check_out), "MMM d, yyyy")
+                    : "—"}
                 </p>
                 <p className="text-sm font-semibold text-[#222222] mt-1">
-                  {booking.total_price.toLocaleString()} XAF
+                  {Number(booking.total_price ?? 0).toLocaleString()} XAF
                 </p>
               </div>
             </Link>
