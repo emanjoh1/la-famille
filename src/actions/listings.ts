@@ -4,6 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
+// ─── Host actions ──────────────────────────────────────────────
+
 export async function createListing(formData: FormData) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -19,6 +21,7 @@ export async function createListing(formData: FormData) {
     max_guests: Number(formData.get("max_guests")),
     amenities: JSON.parse(formData.get("amenities") as string),
     images: JSON.parse(formData.get("images") as string),
+    status: "pending_review" as const, // host submits for review
   };
 
   const { data, error } = await supabaseAdmin
@@ -29,15 +32,18 @@ export async function createListing(formData: FormData) {
 
   if (error) throw error;
 
-  revalidatePath("/explore");
   revalidatePath("/host/listings");
   return data;
 }
 
+// ─── Public listing queries ────────────────────────────────────
+
+/** Returns only admin-approved listings (shown on /explore) */
 export async function getListings() {
   const { data, error } = await supabaseAdmin
     .from("listings")
     .select("*")
+    .eq("status", "approved")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -47,6 +53,7 @@ export async function getListings() {
   return data || [];
 }
 
+/** Returns a single listing by id (approved or owned by the requester) */
 export async function getListing(id: string) {
   const { data, error } = await supabaseAdmin
     .from("listings")
@@ -58,6 +65,7 @@ export async function getListing(id: string) {
   return data;
 }
 
+/** Returns all listings owned by the signed-in host (all statuses) */
 export async function getUserListings() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -73,4 +81,81 @@ export async function getUserListings() {
     return [];
   }
   return data || [];
+}
+
+// ─── Admin actions ─────────────────────────────────────────────
+
+async function assertAdmin() {
+  const { userId, sessionClaims } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  const role = (sessionClaims?.publicMetadata as { role?: string })?.role;
+  if (role !== "admin") throw new Error("Forbidden: admin only");
+  return userId;
+}
+
+/** Returns all listings pending admin review */
+export async function getPendingListings() {
+  await assertAdmin();
+
+  const { data, error } = await supabaseAdmin
+    .from("listings")
+    .select("*")
+    .eq("status", "pending_review")
+    .order("created_at", { ascending: true }); // oldest first
+
+  if (error) {
+    console.error("Error fetching pending listings:", error);
+    return [];
+  }
+  return data || [];
+}
+
+/** Returns all listings for the admin overview (all statuses) */
+export async function getAllListingsAdmin() {
+  await assertAdmin();
+
+  const { data, error } = await supabaseAdmin
+    .from("listings")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching all listings:", error);
+    return [];
+  }
+  return data || [];
+}
+
+/** Admin approves a listing — it becomes visible on /explore */
+export async function approveListing(listingId: string) {
+  await assertAdmin();
+
+  const { error } = await supabaseAdmin
+    .from("listings")
+    .update({ status: "approved", rejection_reason: null })
+    .eq("id", listingId);
+
+  if (error) throw error;
+
+  revalidatePath("/admin");
+  revalidatePath("/explore");
+  revalidatePath("/host/listings");
+}
+
+/** Admin rejects a listing with an optional reason sent back to the host */
+export async function rejectListing(listingId: string, reason?: string) {
+  await assertAdmin();
+
+  const { error } = await supabaseAdmin
+    .from("listings")
+    .update({
+      status: "rejected",
+      rejection_reason: reason ?? null,
+    })
+    .eq("id", listingId);
+
+  if (error) throw error;
+
+  revalidatePath("/admin");
+  revalidatePath("/host/listings");
 }

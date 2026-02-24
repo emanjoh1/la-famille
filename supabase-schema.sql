@@ -13,6 +13,9 @@ CREATE TABLE listings (
   max_guests INTEGER NOT NULL,
   amenities TEXT[] DEFAULT '{}',
   images TEXT[] DEFAULT '{}',
+  status TEXT NOT NULL DEFAULT 'pending_review'
+    CHECK (status IN ('pending_review', 'approved', 'rejected')),
+  rejection_reason TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -80,3 +83,16 @@ CREATE POLICY "Allow all on bookings" ON bookings FOR ALL USING (true);
 CREATE POLICY "Allow all on favorites" ON favorites FOR ALL USING (true);
 CREATE POLICY "Allow all on conversations" ON conversations FOR ALL USING (true);
 CREATE POLICY "Allow all on messages" ON messages FOR ALL USING (true);
+
+-- =============================================================
+-- MIGRATION: Add listing approval system
+-- Run this block if you already created the tables above
+-- =============================================================
+ALTER TABLE listings
+  ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending_review'
+    CHECK (status IN ('pending_review', 'approved', 'rejected')),
+  ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+
+-- Approve any listings that were created before this migration
+UPDATE listings SET status = 'approved' WHERE status = 'pending_review';
+-- =============================================================

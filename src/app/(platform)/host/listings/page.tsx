@@ -3,6 +3,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus } from "lucide-react";
 
+const STATUS_STYLES: Record<string, string> = {
+  pending_review: "bg-amber-100 text-amber-800",
+  approved:       "bg-green-100 text-green-800",
+  rejected:       "bg-red-100 text-red-800",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  pending_review: "Under review",
+  approved:       "Live",
+  rejected:       "Rejected",
+};
+
 export default async function HostListingsPage() {
   const listings = await getUserListings();
 
@@ -16,7 +28,7 @@ export default async function HostListingsPage() {
                      rounded-xl font-medium hover:bg-[#E31C5F] transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Create listing
+          Add listing
         </Link>
       </div>
 
@@ -40,8 +52,8 @@ export default async function HostListingsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {listings.map((listing) => (
             <div key={listing.id} className="group cursor-pointer">
-              <div className="relative aspect-square mb-3 rounded-2xl overflow-hidden bg-gray-200">
-                {listing.images[0] && (
+              <div className="relative aspect-square mb-3 rounded-2xl overflow-hidden bg-[#F7F7F7]">
+                {listing.images[0] ? (
                   <Image
                     src={listing.images[0]}
                     alt={listing.title}
@@ -49,26 +61,51 @@ export default async function HostListingsPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#717171] text-sm">
+                    No photos yet
+                  </div>
                 )}
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <Link
-                    href={`/listings/${listing.id}`}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity
-                               px-4 py-2 bg-white rounded-xl text-sm font-medium
-                               text-[#222222] hover:bg-[#F7F7F7]"
+
+                {/* Status badge */}
+                <div className="absolute top-3 left-3">
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-1 rounded-full
+                                ${STATUS_STYLES[listing.status] ?? "bg-gray-100 text-gray-700"}`}
                   >
-                    View listing
-                  </Link>
+                    {STATUS_LABELS[listing.status] ?? listing.status}
+                  </span>
                 </div>
+
+                {/* View overlay — only for approved */}
+                {listing.status === "approved" && (
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                    <Link
+                      href={`/listings/${listing.id}`}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity
+                                 px-4 py-2 bg-white rounded-xl text-sm font-medium
+                                 text-[#222222] hover:bg-[#F7F7F7]"
+                    >
+                      View listing
+                    </Link>
+                  </div>
+                )}
               </div>
+
               <div className="space-y-1">
                 <h3 className="font-semibold text-[#222222] truncate">{listing.location}</h3>
                 <p className="text-[#717171] text-sm truncate">{listing.title}</p>
                 <p className="text-[#222222]">
-                  <span className="font-semibold">{listing.price_per_night.toLocaleString()} XAF</span>
+                  <span className="font-semibold">
+                    {listing.price_per_night.toLocaleString()} XAF
+                  </span>
                   <span className="text-[#717171] font-normal"> / night</span>
                 </p>
+                {listing.status === "rejected" && listing.rejection_reason && (
+                  <p className="text-xs text-red-600 mt-1 line-clamp-2">
+                    ⚠ {listing.rejection_reason}
+                  </p>
+                )}
               </div>
             </div>
           ))}

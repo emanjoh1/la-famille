@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, AlertCircle } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import { createBooking } from "@/actions/bookings";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,9 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const today = new Date().toISOString().split("T")[0];
 
   const nights =
     checkIn && checkOut
@@ -30,7 +33,15 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const total = subtotal + serviceFee;
 
   const handleReserve = async () => {
-    if (!checkIn || !checkOut || nights === 0) return;
+    setError(null);
+    if (!checkIn || !checkOut) {
+      setError("Please select check-in and check-out dates.");
+      return;
+    }
+    if (nights === 0) {
+      setError("Check-out must be after check-in.");
+      return;
+    }
     setLoading(true);
     try {
       await createBooking({
@@ -41,7 +52,8 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       });
       router.push("/bookings");
     } catch (err) {
-      console.error(err);
+      const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -59,8 +71,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         </div>
         <div className="flex items-center gap-1 text-sm">
           <Star className="w-3.5 h-3.5 fill-[#222222] text-[#222222]" />
-          <span className="font-medium text-[#222222]">4.92</span>
-          <span className="text-[#717171]">· 12 reviews</span>
+          <span className="font-medium text-[#222222]">New</span>
         </div>
       </div>
 
@@ -74,9 +85,14 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
             <input
               type="date"
               value={checkIn}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) => setCheckIn(e.target.value)}
-              className="w-full text-sm text-[#717171] bg-transparent focus:outline-none"
+              min={today}
+              onChange={(e) => {
+                setCheckIn(e.target.value);
+                setError(null);
+                // If checkout is before new checkin, reset it
+                if (checkOut && e.target.value >= checkOut) setCheckOut("");
+              }}
+              className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
             />
           </div>
           <div className="p-3">
@@ -86,9 +102,12 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
             <input
               type="date"
               value={checkOut}
-              min={checkIn || new Date().toISOString().split("T")[0]}
-              onChange={(e) => setCheckOut(e.target.value)}
-              className="w-full text-sm text-[#717171] bg-transparent focus:outline-none"
+              min={checkIn || today}
+              onChange={(e) => {
+                setCheckOut(e.target.value);
+                setError(null);
+              }}
+              className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
             />
           </div>
         </div>
@@ -99,7 +118,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
           <select
             value={guests}
             onChange={(e) => setGuests(Number(e.target.value))}
-            className="w-full text-sm text-[#717171] bg-transparent focus:outline-none"
+            className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
           >
             {Array.from({ length: listing.max_guests }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>
@@ -110,15 +129,23 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         </div>
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
+          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+
       {/* Reserve button */}
       <button
         onClick={handleReserve}
-        disabled={loading || nights === 0}
+        disabled={loading}
         className="w-full py-3.5 bg-gradient-to-r from-[#E61E4D] to-[#FF385C] text-white
                    font-semibold rounded-xl hover:from-[#D01243] hover:to-[#E31C5F]
-                   transition-all mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                   transition-all mb-4 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {loading ? "Reserving..." : "Reserve"}
+        {loading ? "Reserving…" : "Reserve"}
       </button>
       <p className="text-center text-sm text-[#717171] mb-4">You won&apos;t be charged yet</p>
 
