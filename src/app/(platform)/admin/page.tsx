@@ -7,9 +7,15 @@ import AdminActions from "./AdminActions";
 export default async function AdminPage() {
   // Server-side admin guard
   const { userId, sessionClaims } = await auth();
+  console.log("Admin page - userId:", userId);
+  console.log("Admin page - role:", (sessionClaims?.publicMetadata as { role?: string })?.role);
+  
   if (!userId) redirect("/auth");
   const role = (sessionClaims?.publicMetadata as { role?: string })?.role;
-  if (role !== "admin") redirect("/");
+  if (role !== "admin") {
+    console.log("Not admin, redirecting to /explore");
+    redirect("/explore");
+  }
 
   const listings = await getAllListingsAdmin();
 
