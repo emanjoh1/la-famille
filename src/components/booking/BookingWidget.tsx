@@ -89,10 +89,10 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
               onChange={(e) => {
                 setCheckIn(e.target.value);
                 setError(null);
-                // If checkout is before new checkin, reset it
                 if (checkOut && e.target.value >= checkOut) setCheckOut("");
               }}
               className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
+              required
             />
           </div>
           <div className="p-3">
@@ -108,6 +108,8 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setError(null);
               }}
               className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
+              required
+              disabled={!checkIn}
             />
           </div>
         </div>

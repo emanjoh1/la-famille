@@ -264,24 +264,23 @@ export default function NewListingPage() {
         {/* Step 4: Photos */}
         {step === 4 && (
           <div>
-            <div className="border-2 border-dashed border-[#DDDDDD] rounded-2xl p-16
-                            text-center hover:border-[#222222] transition-colors">
+            <label htmlFor="image-upload" className="block border-2 border-dashed border-[#DDDDDD] rounded-2xl p-16
+                            text-center hover:border-[#222222] transition-colors cursor-pointer">
               <Upload className="w-10 h-10 mx-auto mb-4 text-[#717171]" />
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="hidden"
-                id="image-upload"
-              />
-              <label htmlFor="image-upload" className="cursor-pointer">
-                <span className="text-[#FF385C] font-semibold">Upload photos</span>
-                <p className="text-[#717171] text-sm mt-1">
-                  PNG, JPG up to 4MB · max 10 photos
-                </p>
-              </label>
-            </div>
+              <span className="text-[#FF385C] font-semibold block">Upload photos</span>
+              <p className="text-[#717171] text-sm mt-1">
+                PNG, JPG up to 4MB · max 10 photos
+              </p>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+              disabled={uploading}
+            />
             {uploading && (
               <p className="text-sm text-[#717171] mt-3 text-center">Uploading…</p>
             )}
