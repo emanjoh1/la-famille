@@ -41,8 +41,11 @@ export async function getUserBookings() {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    return [];
+  }
+  return data || [];
 }
 
 export async function updateBookingStatus(

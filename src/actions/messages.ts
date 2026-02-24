@@ -56,6 +56,9 @@ export async function getUserConversations() {
     .or(`host_id.eq.${userId},guest_id.eq.${userId}`)
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching conversations:", error);
+    return [];
+  }
+  return data || [];
 }

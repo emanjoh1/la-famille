@@ -40,8 +40,11 @@ export async function getListings() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching listings:", error);
+    return [];
+  }
+  return data || [];
 }
 
 export async function getListing(id: string) {
@@ -65,6 +68,9 @@ export async function getUserListings() {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching user listings:", error);
+    return [];
+  }
+  return data || [];
 }

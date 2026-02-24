@@ -37,6 +37,9 @@ export async function getUserFavorites() {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error("Error fetching favorites:", error);
+    return [];
+  }
+  return data || [];
 }
