@@ -27,6 +27,7 @@ CREATE TABLE bookings (
   user_id TEXT NOT NULL,
   check_in DATE NOT NULL,
   check_out DATE NOT NULL,
+  guests INTEGER NOT NULL DEFAULT 1,
   total_price DECIMAL(10, 2) NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'cancelled')),
   stripe_payment_id TEXT,

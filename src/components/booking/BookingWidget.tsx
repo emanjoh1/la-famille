@@ -49,6 +49,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         check_in: checkIn,
         check_out: checkOut,
         total_price: total,
+        guests,
       });
       router.push("/bookings");
     } catch (err) {

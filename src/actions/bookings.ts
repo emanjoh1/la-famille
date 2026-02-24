@@ -9,6 +9,7 @@ export async function createBooking(data: {
   check_in: string;
   check_out: string;
   total_price: number;
+  guests: number;
 }) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
