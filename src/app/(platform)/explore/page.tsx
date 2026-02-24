@@ -6,12 +6,13 @@ import { Heart } from "lucide-react";
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: { location?: string };
+  searchParams: Promise<{ location?: string }>;
 }) {
+  const { location } = await searchParams;
   const allListings = await getListings();
-  const listings = searchParams.location
+  const listings = location
     ? allListings.filter((l) =>
-        l.location.toLowerCase().includes(searchParams.location!.toLowerCase())
+        l.location.toLowerCase().includes(location.toLowerCase())
       )
     : allListings;
 
@@ -19,8 +20,8 @@ export default async function ExplorePage({
     <div className="container mx-auto px-6 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold">
-          {searchParams.location
-            ? `Stays in ${searchParams.location}`
+          {location
+            ? `Stays in ${location}`
             : "Stays in Cameroon"}
         </h1>
         {listings.length > 0 && (
