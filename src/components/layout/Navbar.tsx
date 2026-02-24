@@ -2,11 +2,24 @@
 
 import Link from "next/link";
 import { Globe, Menu, Search } from "lucide-react";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const { user } = useUser();
+  const isAdmin = (user?.publicMetadata?.role as string) === "admin";
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.set("location", location);
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    window.location.href = `/explore${params.toString() ? `?${params}` : ""}`;
+  };
 
   return (
     <nav className="sticky top-0 bg-white border-b border-[#DDDDDD] z-50">
@@ -20,29 +33,36 @@ export function Navbar() {
 
           {/* Center: Search pill */}
           <div className="hidden md:flex items-stretch border border-[#DDDDDD] rounded-full
-                          shadow-sm hover:shadow-md transition-shadow cursor-pointer divide-x divide-[#DDDDDD]
-                          flex-1 max-w-md">
-            <div className="flex-1 px-4 py-2 flex flex-col justify-center rounded-l-full hover:bg-[#F7F7F7] transition-colors">
-              <span className="text-xs font-semibold text-[#222222]">Where</span>
-              <span className="text-xs text-[#717171]">Anywhere</span>
-            </div>
-            <div className="px-4 py-2 flex flex-col justify-center hover:bg-[#F7F7F7] transition-colors">
-              <span className="text-xs font-semibold text-[#222222]">When</span>
-              <span className="text-xs text-[#717171]">Any week</span>
-            </div>
-            <div className="flex items-center gap-2 pl-4 pr-2 py-1.5 rounded-r-full hover:bg-[#F7F7F7] transition-colors">
-              <div>
-                <span className="text-xs font-semibold text-[#222222] block">Who</span>
-                <span className="text-xs text-[#717171]">Add guests</span>
-              </div>
-              <Link
-                href="/explore"
-                className="p-2 bg-[#FF385C] text-white rounded-full hover:bg-[#E31C5F] transition-colors flex-shrink-0"
-                aria-label="Search"
-              >
-                <Search className="w-3 h-3" />
-              </Link>
-            </div>
+                          shadow-sm hover:shadow-md transition-shadow divide-x divide-[#DDDDDD]
+                          flex-1 max-w-2xl">
+            <input
+              type="text"
+              placeholder="Where"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="flex-1 px-4 py-2 text-sm text-[#222222] rounded-l-full focus:outline-none"
+            />
+            <input
+              type="date"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="px-4 py-2 text-sm text-[#222222] focus:outline-none"
+            />
+            <input
+              type="date"
+              value={checkOut}
+              min={checkIn}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className="px-4 py-2 text-sm text-[#222222] focus:outline-none"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-[#FF385C] text-white rounded-r-full hover:bg-[#E31C5F] transition-colors"
+              aria-label="Search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Right: Host link + Globe + Hamburger menu */}
@@ -111,6 +131,15 @@ export function Navbar() {
                       Messages
                     </Link>
                     <div className="border-t border-[#DDDDDD] my-1" />
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2.5 text-sm font-semibold text-[#FF385C] hover:bg-[#F7F7F7]"
+                      >
+                        Admin Panel
+                      </Link>
+                    )}
                     <Link
                       href="/host/listings"
                       onClick={() => setMenuOpen(false)}

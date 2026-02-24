@@ -1,4 +1,5 @@
 import { getListings } from "@/actions/listings";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
@@ -6,15 +7,32 @@ import { Heart } from "lucide-react";
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ location?: string }>;
+  searchParams: Promise<{ location?: string; checkIn?: string; checkOut?: string }>;
 }) {
-  const { location } = await searchParams;
-  const allListings = await getListings();
-  const listings = location
-    ? allListings.filter((l) =>
-        l.location.toLowerCase().includes(location.toLowerCase())
-      )
-    : allListings;
+  const { location, checkIn, checkOut } = await searchParams;
+  let allListings = await getListings();
+
+  // Filter by location
+  if (location) {
+    allListings = allListings.filter((l) =>
+      l.location.toLowerCase().includes(location.toLowerCase())
+    );
+  }
+
+  // Filter by date availability
+  if (checkIn && checkOut) {
+    const { data: bookings } = await supabaseAdmin
+      .from("bookings")
+      .select("listing_id")
+      .gte("check_out", checkIn)
+      .lte("check_in", checkOut)
+      .in("status", ["pending", "confirmed"]);
+
+    const bookedIds = new Set(bookings?.map((b) => b.listing_id) || []);
+    allListings = allListings.filter((l) => !bookedIds.has(l.id));
+  }
+
+  const listings = allListings;
 
   return (
     <div className="container mx-auto px-6 py-8">
