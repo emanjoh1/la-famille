@@ -32,20 +32,25 @@ export async function createBooking(data: {
 }
 
 export async function getUserBookings() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) return [];
 
-  const { data, error } = await supabaseAdmin
-    .from("bookings")
-    .select("*, listings(*)")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    const { data, error } = await supabaseAdmin
+      .from("bookings")
+      .select("*, listings(*)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching bookings:", error);
+    if (error) {
+      console.error("Error fetching bookings:", error);
+      return [];
+    }
+    return data || [];
+  } catch (e) {
+    console.error("getUserBookings exception:", e);
     return [];
   }
-  return data || [];
 }
 
 export async function updateBookingStatus(

@@ -1,6 +1,5 @@
 import { getUserListings } from "@/actions/listings";
 import Link from "next/link";
-import Image from "next/image";
 import { Plus } from "lucide-react";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -54,12 +53,11 @@ export default async function HostListingsPage() {
             <div key={listing.id} className="group cursor-pointer">
               <div className="relative aspect-square mb-3 rounded-2xl overflow-hidden bg-[#F7F7F7]">
                 {listing.images[0] ? (
-                  <Image
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
                     src={listing.images[0]}
                     alt={listing.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#717171] text-sm">

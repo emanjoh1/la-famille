@@ -1,7 +1,6 @@
 import { getAllListingsAdmin } from "@/actions/listings";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import AdminActions from "./AdminActions";
 
 export default async function AdminPage() {
@@ -83,18 +82,16 @@ function Section({
             className="border border-[#DDDDDD] rounded-2xl overflow-hidden flex flex-col sm:flex-row"
           >
             {/* Thumbnail */}
-            <div className="relative w-full sm:w-44 h-40 sm:h-auto flex-shrink-0 bg-[#F7F7F7]">
+            <div className="w-full sm:w-44 h-40 sm:h-44 flex-shrink-0 bg-[#F7F7F7] flex items-center justify-center overflow-hidden">
               {listing.images[0] ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={listing.images[0]}
                   alt={listing.title}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#717171] text-sm">
-                  No photo
-                </div>
+                <span className="text-[#717171] text-sm">No photo</span>
               )}
             </div>
 

@@ -1,6 +1,5 @@
 import { getUserBookings } from "@/actions/bookings";
 import { format } from "date-fns";
-import Image from "next/image";
 import Link from "next/link";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -43,15 +42,16 @@ export default async function BookingsPage() {
               className="flex gap-6 p-4 border border-[#DDDDDD] rounded-2xl
                          hover:shadow-md transition-shadow group"
             >
-              <div className="relative w-40 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200">
-                {booking.listings?.images?.[0] && (
-                  <Image
+              <div className="relative w-40 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                {booking.listings?.images?.[0] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
                     src={booking.listings.images[0]}
                     alt={booking.listings.title ?? "Listing"}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="160px"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                ) : (
+                  <span className="text-3xl">🏠</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">

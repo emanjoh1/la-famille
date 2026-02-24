@@ -1,5 +1,4 @@
 import { getListing } from "@/actions/listings";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Star,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import { AMENITIES } from "@/lib/utils/constants";
 import { BookingWidget } from "@/components/booking/BookingWidget";
+import { ImageGallery } from "@/components/listings/ImageGallery";
 import type { LucideIcon } from "lucide-react";
 
 const AMENITY_ICONS: Record<string, LucideIcon> = {
@@ -69,43 +69,8 @@ export default async function ListingDetailPage({
         </div>
       </div>
 
-      {/* Photo gallery */}
-      <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden mb-8 h-[400px] md:h-[500px]">
-        {/* Large left photo */}
-        <div className="relative">
-          {listing.images?.[0] ? (
-            <Image
-              src={listing.images[0]}
-              alt={listing.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span className="text-6xl">🏠</span>
-            </div>
-          )}
-        </div>
-        {/* 2x2 right grid */}
-        <div className="grid grid-cols-2 gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="relative">
-              {listing.images?.[i] ? (
-                <Image
-                  src={listing.images[i]}
-                  alt={`${listing.title} photo ${i + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="25vw"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-100" />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Photo gallery with swipe / lightbox */}
+      <ImageGallery images={listing.images ?? []} title={listing.title} />
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12">
