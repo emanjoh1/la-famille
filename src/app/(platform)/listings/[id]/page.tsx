@@ -1,0 +1,198 @@
+import { getListing } from "@/actions/listings";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import {
+  Star,
+  Wifi,
+  AirVent,
+  Car,
+  Waves,
+  CookingPot,
+  Tv,
+  Zap,
+  Droplets,
+  ShieldCheck,
+  Fence,
+  Flame,
+  Share,
+  Heart,
+  WashingMachine,
+} from "lucide-react";
+import { AMENITIES } from "@/lib/utils/constants";
+import { BookingWidget } from "@/components/booking/BookingWidget";
+import type { LucideIcon } from "lucide-react";
+
+const AMENITY_ICONS: Record<string, LucideIcon> = {
+  wifi: Wifi,
+  ac: AirVent,
+  parking: Car,
+  pool: Waves,
+  kitchen: CookingPot,
+  washer: WashingMachine,
+  tv: Tv,
+  generator: Zap,
+  water_tank: Droplets,
+  security_guard: ShieldCheck,
+  gated: Fence,
+  hot_water: Flame,
+};
+
+export default async function ListingDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  let listing;
+  try {
+    listing = await getListing(id);
+  } catch {
+    notFound();
+  }
+
+  const amenityDetails = AMENITIES.filter((a) =>
+    listing.amenities?.includes(a.key)
+  );
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Title row */}
+      <div className="flex items-start justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-[#222222] flex-1 pr-4">{listing.title}</h1>
+        <div className="flex items-center gap-4 flex-shrink-0">
+          <button className="flex items-center gap-1.5 text-sm font-medium text-[#222222] underline hover:text-[#717171] transition-colors">
+            <Share className="w-4 h-4" /> Share
+          </button>
+          <button className="flex items-center gap-1.5 text-sm font-medium text-[#222222] underline hover:text-[#717171] transition-colors">
+            <Heart className="w-4 h-4" /> Save
+          </button>
+        </div>
+      </div>
+
+      {/* Photo gallery */}
+      <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden mb-8 h-[400px] md:h-[500px]">
+        {/* Large left photo */}
+        <div className="relative">
+          {listing.images?.[0] ? (
+            <Image
+              src={listing.images[0]}
+              alt={listing.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-6xl">🏠</span>
+            </div>
+          )}
+        </div>
+        {/* 2x2 right grid */}
+        <div className="grid grid-cols-2 gap-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="relative">
+              {listing.images?.[i] ? (
+                <Image
+                  src={listing.images[i]}
+                  alt={`${listing.title} photo ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="25vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-100" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12">
+        {/* LEFT */}
+        <div>
+          {/* Location + quick stats */}
+          <div className="pb-6 border-b border-[#DDDDDD]">
+            <h2 className="text-xl font-semibold text-[#222222] mb-1">{listing.location}</h2>
+            <p className="text-[#717171]">
+              {listing.bedrooms} bedroom{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
+              {listing.bathrooms} bathroom{listing.bathrooms !== 1 ? "s" : ""} ·{" "}
+              Up to {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
+            </p>
+          </div>
+
+          {/* Host info */}
+          <div className="py-6 border-b border-[#DDDDDD] flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-200 to-rose-400 flex-shrink-0 flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">H</span>
+            </div>
+            <div>
+              <p className="font-medium text-[#222222]">Hosted by a La Famille host</p>
+              <p className="text-sm text-[#717171]">Superhost · 3 years hosting</p>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="py-6 border-b border-[#DDDDDD]">
+            <p className="text-[#222222] leading-relaxed whitespace-pre-wrap">
+              {listing.description}
+            </p>
+          </div>
+
+          {/* Amenities */}
+          {amenityDetails.length > 0 && (
+            <div className="py-6 border-b border-[#DDDDDD]">
+              <h3 className="text-xl font-semibold text-[#222222] mb-6">
+                What this place offers
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {amenityDetails.map((amenity) => {
+                  const Icon = AMENITY_ICONS[amenity.key] ?? Wifi;
+                  return (
+                    <div key={amenity.key} className="flex items-center gap-4">
+                      <Icon className="w-5 h-5 text-[#222222] flex-shrink-0" />
+                      <span className="text-[#222222]">{amenity.label_en}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Reviews summary */}
+          <div className="py-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-5 h-5 fill-[#222222] text-[#222222]" />
+              <span className="text-xl font-semibold text-[#222222]">4.92</span>
+              <span className="text-[#222222]">· 12 reviews</span>
+            </div>
+            <p className="text-[#717171] text-sm">
+              Reviews will appear here once guests leave feedback.
+            </p>
+          </div>
+        </div>
+
+        {/* RIGHT: Sticky booking widget */}
+        <div className="hidden lg:block">
+          <div className="sticky top-28">
+            <BookingWidget listing={listing} />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile sticky bottom bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD]
+                      px-6 py-4 flex items-center justify-between z-50">
+        <div>
+          <span className="font-semibold text-[#222222]">
+            {listing.price_per_night.toLocaleString()} XAF
+          </span>
+          <span className="text-[#717171]"> / night</span>
+        </div>
+        <button className="px-6 py-3 bg-[#FF385C] text-white rounded-xl font-medium hover:bg-[#E31C5F] transition-colors">
+          Reserve
+        </button>
+      </div>
+    </div>
+  );
+}

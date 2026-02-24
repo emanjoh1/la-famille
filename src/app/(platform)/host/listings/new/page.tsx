@@ -4,148 +4,294 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createListing } from "@/actions/listings";
 import { useUploadThing } from "@/lib/uploadthing";
-import { Upload } from "lucide-react";
+import {
+  Upload,
+  Home,
+  MapPin,
+  Users,
+  DollarSign,
+  CheckCircle,
+} from "lucide-react";
+
+const STEPS = [
+  { id: 1, title: "About your place", icon: Home },
+  { id: 2, title: "Location", icon: MapPin },
+  { id: 3, title: "Details", icon: Users },
+  { id: 4, title: "Photos", icon: Upload },
+  { id: 5, title: "Pricing", icon: DollarSign },
+];
+
+type FormField = "title" | "description" | "location" | "bedrooms" | "bathrooms" | "max_guests" | "price_per_night";
 
 export default function NewListingPage() {
   const router = useRouter();
+  const [step, setStep] = useState(1);
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const { startUpload } = useUploadThing("listingImages");
 
+  const [formValues, setFormValues] = useState<Record<FormField, string>>({
+    title: "",
+    description: "",
+    location: "",
+    bedrooms: "1",
+    bathrooms: "1",
+    max_guests: "1",
+    price_per_night: "",
+  });
+
+  const update = (k: FormField, v: string) =>
+    setFormValues((prev) => ({ ...prev, [k]: v }));
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-
     setUploading(true);
     const uploaded = await startUpload(Array.from(files));
-    if (uploaded) {
-      setImages([...images, ...uploaded.map((f) => f.url)]);
-    }
+    if (uploaded) setImages((prev) => [...prev, ...uploaded.map((f) => f.url)]);
     setUploading(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    Object.entries(formValues).forEach(([k, v]) => formData.append(k, v));
     formData.append("images", JSON.stringify(images));
     formData.append("amenities", JSON.stringify([]));
-
     await createListing(formData);
     router.push("/host/listings");
   };
 
+  const counterFields: { key: FormField; label: string }[] = [
+    { key: "bedrooms", label: "Bedrooms" },
+    { key: "bathrooms", label: "Bathrooms" },
+    { key: "max_guests", label: "Max guests" },
+  ];
+
   return (
-    <div className="container mx-auto px-6 py-8 max-w-3xl">
-      <h1 className="text-3xl font-semibold mb-8">List your property</h1>
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
-          <label className="block text-lg font-medium mb-3">Property title</label>
-          <input
-            name="title"
-            type="text"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            placeholder="Beautiful apartment in Douala"
-          />
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium mb-3">Description</label>
-          <textarea
-            name="description"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            rows={5}
-            placeholder="Tell guests about your property..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-lg font-medium mb-3">Location</label>
-          <input
-            name="location"
-            type="text"
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            placeholder="e.g., Douala, Yaoundé, Bafoussam"
-          />
-        </div>
-
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-lg font-medium mb-3">Bedrooms</label>
-            <input
-              name="bedrooms"
-              type="number"
-              required
-              min="1"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            />
+    <div className="min-h-screen bg-white">
+      {/* Sticky top progress bar */}
+      <div className="sticky top-20 bg-white border-b border-[#DDDDDD] z-40">
+        <div className="max-w-2xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-3">
+            {STEPS.map((s) => (
+              <div key={s.id} className="flex flex-col items-center gap-1">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold
+                               transition-colors
+                               ${
+                                 step > s.id
+                                   ? "bg-[#222222] text-white"
+                                   : step === s.id
+                                   ? "bg-[#FF385C] text-white"
+                                   : "border-2 border-[#DDDDDD] text-[#717171]"
+                               }`}
+                >
+                  {step > s.id ? <CheckCircle className="w-4 h-4" /> : s.id}
+                </div>
+                <span className="text-xs text-[#717171] hidden md:block">{s.title}</span>
+              </div>
+            ))}
           </div>
-          <div>
-            <label className="block text-lg font-medium mb-3">Bathrooms</label>
-            <input
-              name="bathrooms"
-              type="number"
-              required
-              min="1"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-lg font-medium mb-3">Guests</label>
-            <input
-              name="max_guests"
-              type="number"
-              required
-              min="1"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+          <div className="w-full bg-[#DDDDDD] rounded-full h-1">
+            <div
+              className="bg-[#FF385C] h-1 rounded-full transition-all duration-300"
+              style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
             />
           </div>
         </div>
+      </div>
 
-        <div>
-          <label className="block text-lg font-medium mb-3">Price per night (XAF)</label>
-          <input
-            name="price_per_night"
-            type="number"
-            required
-            min="1"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-          />
-        </div>
+      {/* Step content */}
+      <div className="max-w-2xl mx-auto px-6 py-12 pb-32">
+        <p className="text-sm text-[#717171] mb-2">Step {step} of {STEPS.length}</p>
+        <h1 className="text-3xl font-semibold text-[#222222] mb-10">
+          {STEPS[step - 1].title}
+        </h1>
 
-        <div>
-          <label className="block text-lg font-medium mb-3">Photos</label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-rose-500 transition">
-            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              className="hidden"
-              id="image-upload"
-            />
-            <label htmlFor="image-upload" className="cursor-pointer">
-              <span className="text-rose-500 font-medium">Upload photos</span>
-              <p className="text-gray-600 text-sm mt-2">or drag and drop</p>
+        {/* Step 1: About */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-[#222222] mb-2">
+                Property title
+              </label>
+              <input
+                value={formValues.title}
+                onChange={(e) => update("title", e.target.value)}
+                placeholder="Beautiful apartment in Douala"
+                className="w-full px-4 py-3 border border-[#DDDDDD] rounded-xl text-[#222222]
+                           placeholder-[#717171] focus:outline-none focus:border-[#222222]
+                           transition-colors text-base"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-[#222222] mb-2">
+                Description
+              </label>
+              <textarea
+                value={formValues.description}
+                onChange={(e) => update("description", e.target.value)}
+                rows={6}
+                placeholder="Tell guests about your property..."
+                className="w-full px-4 py-3 border border-[#DDDDDD] rounded-xl text-[#222222]
+                           placeholder-[#717171] focus:outline-none focus:border-[#222222]
+                           transition-colors text-base resize-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Location */}
+        {step === 2 && (
+          <div>
+            <label className="block text-sm font-semibold text-[#222222] mb-2">
+              Location
             </label>
+            <input
+              value={formValues.location}
+              onChange={(e) => update("location", e.target.value)}
+              placeholder="e.g., Douala, Yaoundé, Bafoussam"
+              className="w-full px-4 py-3 border border-[#DDDDDD] rounded-xl text-[#222222]
+                         placeholder-[#717171] focus:outline-none focus:border-[#222222]
+                         transition-colors text-base"
+            />
           </div>
-          {uploading && <p className="text-sm text-gray-600 mt-2">Uploading...</p>}
-          {images.length > 0 && (
-            <p className="text-sm text-green-600 mt-2">{images.length} photos uploaded</p>
+        )}
+
+        {/* Step 3: Details (counter style) */}
+        {step === 3 && (
+          <div>
+            {counterFields.map(({ key, label }) => (
+              <div
+                key={key}
+                className="flex items-center justify-between py-5 border-b border-[#DDDDDD]"
+              >
+                <span className="font-medium text-[#222222]">{label}</span>
+                <div className="flex items-center gap-5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      update(key, String(Math.max(1, Number(formValues[key]) - 1)))
+                    }
+                    className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center
+                               justify-center text-[#717171] hover:border-[#222222] hover:text-[#222222]
+                               transition-colors text-lg"
+                  >
+                    −
+                  </button>
+                  <span className="text-[#222222] font-medium w-6 text-center">
+                    {formValues[key]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      update(key, String(Number(formValues[key]) + 1))
+                    }
+                    className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center
+                               justify-center text-[#717171] hover:border-[#222222] hover:text-[#222222]
+                               transition-colors text-lg"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Step 4: Photos */}
+        {step === 4 && (
+          <div>
+            <div className="border-2 border-dashed border-[#DDDDDD] rounded-2xl p-16
+                            text-center hover:border-[#222222] transition-colors">
+              <Upload className="w-10 h-10 mx-auto mb-4 text-[#717171]" />
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+                id="image-upload"
+              />
+              <label htmlFor="image-upload" className="cursor-pointer">
+                <span className="text-[#FF385C] font-semibold">Upload photos</span>
+                <p className="text-[#717171] text-sm mt-1">
+                  or drag and drop · PNG, JPG up to 10MB
+                </p>
+              </label>
+            </div>
+            {uploading && (
+              <p className="text-sm text-[#717171] mt-3 text-center">Uploading...</p>
+            )}
+            {images.length > 0 && (
+              <p className="text-sm text-green-600 mt-3 text-center font-medium">
+                {images.length} photo{images.length !== 1 ? "s" : ""} uploaded ✓
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Step 5: Pricing */}
+        {step === 5 && (
+          <div>
+            <label className="block text-sm font-semibold text-[#222222] mb-2">
+              Price per night (XAF)
+            </label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#717171] font-medium text-sm">
+                FCFA
+              </span>
+              <input
+                type="number"
+                value={formValues.price_per_night}
+                onChange={(e) => update("price_per_night", e.target.value)}
+                min="1"
+                placeholder="0"
+                className="w-full pl-16 pr-4 py-4 border border-[#DDDDDD] rounded-xl text-[#222222]
+                           text-2xl font-semibold focus:outline-none focus:border-[#222222]
+                           transition-colors"
+              />
+            </div>
+            <p className="text-sm text-[#717171] mt-2">
+              Set a competitive price to attract your first guests
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Fixed bottom nav */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD] z-40">
+        <div className="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
+          <button
+            onClick={() => setStep((s) => Math.max(1, s - 1))}
+            disabled={step === 1}
+            className="px-6 py-3 border border-[#222222] rounded-xl text-[#222222]
+                       font-medium hover:bg-[#F7F7F7] disabled:opacity-40 disabled:cursor-not-allowed
+                       transition-colors"
+          >
+            Back
+          </button>
+
+          {step < STEPS.length ? (
+            <button
+              onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
+              className="px-8 py-3 bg-[#222222] text-white rounded-xl font-medium
+                         hover:bg-black transition-colors"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={uploading}
+              className="px-8 py-3 bg-[#FF385C] text-white rounded-xl font-medium
+                         hover:bg-[#E31C5F] disabled:opacity-50 transition-colors"
+            >
+              Publish listing
+            </button>
           )}
         </div>
-
-        <button
-          type="submit"
-          disabled={uploading}
-          className="w-full py-4 bg-rose-500 text-white rounded-lg hover:bg-rose-600 disabled:bg-gray-400 font-medium text-lg transition"
-        >
-          Publish listing
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

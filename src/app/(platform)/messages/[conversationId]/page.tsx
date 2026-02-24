@@ -1,70 +1,180 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getConversation, getMessages, sendMessage } from "@/actions/messages";
+import { useState, useEffect, useRef } from "react";
+import {
+  getConversation,
+  getMessages,
+  getUserConversations,
+  sendMessage,
+} from "@/actions/messages";
 import { format } from "date-fns";
+import Link from "next/link";
+import { Send, MessageCircle } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function ConversationPage({
   params,
 }: {
   params: { conversationId: string };
 }) {
+  const { userId } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [conversation, setConversation] = useState<any>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
   const [content, setContent] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [params.conversationId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const loadData = async () => {
-    const [conv, msgs] = await Promise.all([
+    const [conv, msgs, allConvs] = await Promise.all([
       getConversation(params.conversationId),
       getMessages(params.conversationId),
+      getUserConversations(),
     ]);
     setConversation(conv);
     setMessages(msgs);
+    setConversations(allConvs);
   };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
     await sendMessage(params.conversationId, content);
     setContent("");
     loadData();
   };
 
-  if (!conversation) return <div>Loading...</div>;
+  if (!conversation) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-6 h-[600px] flex items-center justify-center">
+        <div className="text-[#717171]">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">{conversation.listings.title}</h1>
-      <div className="bg-white rounded-lg shadow p-6 mb-4 h-96 overflow-y-auto">
-        {messages.map((msg) => (
-          <div key={msg.id} className="mb-4">
-            <p className="text-sm text-gray-600">
-              {format(new Date(msg.created_at), "MMM dd, HH:mm")}
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <h1 className="text-3xl font-semibold text-[#222222] mb-6">Messages</h1>
+
+      <div
+        className="flex border border-[#DDDDDD] rounded-2xl overflow-hidden"
+        style={{ height: "calc(100vh - 240px)", minHeight: "500px" }}
+      >
+        {/* Left sidebar */}
+        <div className="w-80 lg:w-96 border-r border-[#DDDDDD] flex-shrink-0 overflow-y-auto">
+          {conversations.map((conv) => (
+            <Link
+              key={conv.id}
+              href={`/messages/${conv.id}`}
+              className={`flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD]
+                          hover:bg-[#F7F7F7] transition-colors
+                          ${conv.id === params.conversationId ? "bg-[#F7F7F7]" : ""}`}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-200 to-rose-400 flex-shrink-0 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">H</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className={`truncate text-sm ${
+                    conv.id === params.conversationId
+                      ? "font-semibold text-[#222222]"
+                      : "font-medium text-[#222222]"
+                  }`}
+                >
+                  {conv.listings?.title}
+                </p>
+                <p className="text-xs text-[#717171] truncate">
+                  {conv.listings?.location}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Right: Message thread */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Thread header */}
+          <div className="px-6 py-4 border-b border-[#DDDDDD] flex-shrink-0">
+            <p className="font-semibold text-[#222222]">
+              {conversation.listings?.title}
             </p>
-            <p className="bg-gray-100 p-3 rounded-lg">{msg.content}</p>
+            <p className="text-sm text-[#717171]">
+              {conversation.listings?.location}
+            </p>
           </div>
-        ))}
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <MessageCircle className="w-10 h-10 text-[#DDDDDD] mb-3" />
+                <p className="text-[#717171] text-sm">No messages yet. Say hello!</p>
+              </div>
+            )}
+            {messages.map((msg) => {
+              const isOwn = msg.sender_id === userId;
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                >
+                  <div className="max-w-[70%]">
+                    <div
+                      className={`px-4 py-2.5 rounded-2xl text-sm ${
+                        isOwn
+                          ? "bg-[#FF385C] text-white rounded-br-sm"
+                          : "bg-[#F7F7F7] text-[#222222] rounded-bl-sm"
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                    <p
+                      className={`text-xs text-[#717171] mt-1 ${
+                        isOwn ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {format(new Date(msg.created_at), "MMM d, HH:mm")}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Message input */}
+          <form
+            onSubmit={handleSend}
+            className="px-6 py-4 border-t border-[#DDDDDD] flex items-center gap-3 flex-shrink-0"
+          >
+            <input
+              type="text"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Message your host..."
+              className="flex-1 px-5 py-3 border border-[#DDDDDD] rounded-full text-sm
+                         text-[#222222] placeholder-[#717171] focus:outline-none
+                         focus:border-[#222222] transition-colors"
+            />
+            <button
+              type="submit"
+              disabled={!content.trim()}
+              className="p-3 bg-[#FF385C] text-white rounded-full hover:bg-[#E31C5F]
+                         disabled:bg-[#DDDDDD] transition-colors flex-shrink-0"
+              aria-label="Send"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
       </div>
-      <form onSubmit={handleSend} className="flex gap-2">
-        <input
-          type="text"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 px-4 py-2 border rounded-lg"
-        />
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Send
-        </button>
-      </form>
     </div>
   );
 }

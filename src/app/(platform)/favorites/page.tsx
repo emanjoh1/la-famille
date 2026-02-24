@@ -1,45 +1,46 @@
 import { getUserFavorites } from "@/actions/favorites";
+import { ListingCard } from "@/components/listings/ListingCard";
 import Link from "next/link";
-import Image from "next/image";
+import { Heart } from "lucide-react";
 
 export default async function FavoritesPage() {
   const favorites = await getUserFavorites();
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Favorites</h1>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-semibold text-[#222222] mb-8">Wishlists</h1>
+
       {favorites.length === 0 ? (
-        <p className="text-gray-600">No favorites yet.</p>
+        <div className="border border-[#DDDDDD] rounded-2xl p-12 text-center">
+          <Heart className="w-10 h-10 text-[#717171] mx-auto mb-4" />
+          <p className="text-2xl font-semibold text-[#222222] mb-3">
+            Create your first wishlist
+          </p>
+          <p className="text-[#717171] mb-8 max-w-sm mx-auto">
+            As you search, tap the heart icon to save your favourite places to a wishlist
+          </p>
+          <Link
+            href="/explore"
+            className="inline-block px-6 py-3 border border-[#222222] rounded-xl
+                       text-[#222222] font-medium hover:bg-[#F7F7F7] transition-colors"
+          >
+            Start exploring
+          </Link>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {favorites.map((fav) => (
-            <Link
+            <ListingCard
               key={fav.id}
-              href={`/listings/${fav.listings.id}`}
-              className="bg-white rounded-lg shadow hover:shadow-lg transition"
-            >
-              <div className="relative h-48 bg-gray-200 rounded-t-lg">
-                {fav.listings.images[0] && (
-                  <Image
-                    src={fav.listings.images[0]}
-                    alt={fav.listings.title}
-                    fill
-                    className="object-cover rounded-t-lg"
-                  />
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">
-                  {fav.listings.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-2">
-                  {fav.listings.location}
-                </p>
-                <p className="text-blue-600 font-bold">
-                  {fav.listings.price_per_night.toLocaleString()} XAF/night
-                </p>
-              </div>
-            </Link>
+              id={fav.listings.id}
+              location={fav.listings.location}
+              title={fav.listings.title}
+              bedrooms={fav.listings.bedrooms}
+              bathrooms={fav.listings.bathrooms}
+              price_per_night={fav.listings.price_per_night}
+              images={fav.listings.images}
+              isFavorited={true}
+            />
           ))}
         </div>
       )}
