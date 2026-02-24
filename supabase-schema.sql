@@ -96,3 +96,52 @@ ALTER TABLE listings
 -- Approve any listings that were created before this migration
 UPDATE listings SET status = 'approved' WHERE status = 'pending_review';
 -- =============================================================
+
+-- =============================================================
+-- MIGRATION: Fix user identity columns UUID → TEXT
+-- Clerk user IDs look like "user_3A5t01umAiUO43HxQpZxpjezuP8" and
+-- are NOT valid UUIDs. If your tables were created with UUID type
+-- for these columns, every booking / listing / message write will
+-- fail with "invalid input syntax for type uuid".
+-- Run this block in your Supabase SQL Editor.
+-- =============================================================
+
+-- Drop dependent indexes first (safe — we recreate them below)
+DROP INDEX IF EXISTS idx_listings_user_id;
+DROP INDEX IF EXISTS idx_bookings_user_id;
+DROP INDEX IF EXISTS idx_favorites_user_id;
+DROP INDEX IF EXISTS idx_conversations_host_id;
+DROP INDEX IF EXISTS idx_conversations_guest_id;
+
+-- listings
+ALTER TABLE listings
+  ALTER COLUMN user_id TYPE TEXT USING user_id::text;
+
+-- bookings
+ALTER TABLE bookings
+  ALTER COLUMN user_id TYPE TEXT USING user_id::text;
+
+-- favorites  (has a UNIQUE constraint — drop + recreate)
+ALTER TABLE favorites
+  DROP CONSTRAINT IF EXISTS favorites_user_id_listing_id_key;
+ALTER TABLE favorites
+  ALTER COLUMN user_id TYPE TEXT USING user_id::text;
+ALTER TABLE favorites
+  ADD CONSTRAINT favorites_user_id_listing_id_key UNIQUE (user_id, listing_id);
+
+-- conversations
+ALTER TABLE conversations
+  ALTER COLUMN host_id TYPE TEXT USING host_id::text,
+  ALTER COLUMN guest_id TYPE TEXT USING guest_id::text;
+
+-- messages
+ALTER TABLE messages
+  ALTER COLUMN sender_id TYPE TEXT USING sender_id::text;
+
+-- Recreate the performance indexes
+CREATE INDEX IF NOT EXISTS idx_listings_user_id      ON listings(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookings_user_id      ON bookings(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user_id     ON favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_host_id ON conversations(host_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_guest_id ON conversations(guest_id);
+-- =============================================================
