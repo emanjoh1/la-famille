@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
+import { LanguageProvider } from "@/lib/i18n/provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,7 +11,27 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "La Famille - Property Rentals in Cameroon",
-  description: "Find and rent properties across Cameroon - Douala, Yaoundé, and beyond",
+  description:
+    "Find and rent properties across Cameroon - Douala, Yaoundé, and beyond",
+  openGraph: {
+    title: "La Famille - Property Rentals in Cameroon",
+    description:
+      "Find and rent unique properties across Cameroon. Apartments, houses, villas, and more.",
+    type: "website",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  themeColor: "#FF385C",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "La Famille",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -20,9 +41,14 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <html lang="en">
-        <body className={`${inter.variable} antialiased`}>
-          {children}
+      <html lang="fr">
+        <head>
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        </head>
+        <body className={`${inter.variable} antialiased touch-manipulation`}>
+          <LanguageProvider>{children}</LanguageProvider>
         </body>
       </html>
     </ClerkProvider>

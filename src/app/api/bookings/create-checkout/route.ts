@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: "usd",
+            currency: "xaf",
             product_data: {
               name: listingTitle,
             },
-            unit_amount: Math.round(totalPrice * 100),
+            unit_amount: totalPrice, // XAF is zero-decimal currency
           },
           quantity: 1,
         },
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?cancelled=true`,
       metadata: {
-        bookingId,
+        booking_id: bookingId,
         userId,
       },
     });

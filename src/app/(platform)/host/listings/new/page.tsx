@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createListing } from "@/actions/listings";
 import { useUploadThing } from "@/lib/uploadthing";
+import { LISTING_CATEGORIES, AMENITIES } from "@/lib/utils/constants";
 import {
   Upload,
   Home,
@@ -13,20 +15,23 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
+  Sparkles,
 } from "lucide-react";
 
 const STEPS = [
   { id: 1, title: "About your place", icon: Home },
   { id: 2, title: "Location", icon: MapPin },
   { id: 3, title: "Details", icon: Users },
-  { id: 4, title: "Photos", icon: Upload },
-  { id: 5, title: "Pricing", icon: DollarSign },
+  { id: 4, title: "Amenities", icon: Sparkles },
+  { id: 5, title: "Photos", icon: Upload },
+  { id: 6, title: "Pricing", icon: DollarSign },
 ];
 
 type FormField =
   | "title"
   | "description"
   | "location"
+  | "category"
   | "bedrooms"
   | "bathrooms"
   | "max_guests"
@@ -36,6 +41,7 @@ export default function NewListingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [images, setImages] = useState<string[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -46,6 +52,7 @@ export default function NewListingPage() {
     title: "",
     description: "",
     location: "",
+    category: "apartment",
     bedrooms: "1",
     bathrooms: "1",
     max_guests: "1",
@@ -61,7 +68,8 @@ export default function NewListingPage() {
     setUploading(true);
     try {
       const uploaded = await startUpload(Array.from(files));
-      if (uploaded) setImages((prev) => [...prev, ...uploaded.map((f) => f.url)]);
+      if (uploaded)
+        setImages((prev) => [...prev, ...uploaded.map((f) => f.url)]);
     } catch {
       setError("Image upload failed. Please try again.");
     } finally {
@@ -76,16 +84,23 @@ export default function NewListingPage() {
       const formData = new FormData();
       Object.entries(formValues).forEach(([k, v]) => formData.append(k, v));
       formData.append("images", JSON.stringify(images));
-      formData.append("amenities", JSON.stringify([]));
+      formData.append("amenities", JSON.stringify(selectedAmenities));
       await createListing(formData);
       setSubmitted(true);
     } catch (err) {
       console.error("Submit error:", err);
-      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      const msg =
+        err instanceof Error ? err.message : "Something went wrong.";
       setError(msg);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const toggleAmenity = (key: string) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   };
 
   const counterFields: { key: FormField; label: string; min: number }[] = [
@@ -106,8 +121,8 @@ export default function NewListingPage() {
             Submitted for review!
           </h1>
           <p className="text-[#717171] mb-8 leading-relaxed">
-            Your property has been submitted and is under review. We&apos;ll approve it
-            within 24–48 hours and notify you once it&apos;s live.
+            Your property has been submitted and is under review. We&apos;ll
+            approve it within 24–48 hours and notify you once it&apos;s live.
           </p>
           <button
             onClick={() => router.push("/host/listings")}
@@ -136,20 +151,24 @@ export default function NewListingPage() {
                                  step > s.id
                                    ? "bg-[#222222] text-white"
                                    : step === s.id
-                                   ? "bg-[#FF385C] text-white"
-                                   : "border-2 border-[#DDDDDD] text-[#717171]"
+                                     ? "bg-[#FF385C] text-white"
+                                     : "border-2 border-[#DDDDDD] text-[#717171]"
                                }`}
                 >
                   {step > s.id ? <CheckCircle className="w-4 h-4" /> : s.id}
                 </div>
-                <span className="text-xs text-[#717171] hidden md:block">{s.title}</span>
+                <span className="text-xs text-[#717171] hidden md:block">
+                  {s.title}
+                </span>
               </div>
             ))}
           </div>
           <div className="w-full bg-[#DDDDDD] rounded-full h-1">
             <div
               className="bg-[#FF385C] h-1 rounded-full transition-all duration-300"
-              style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
+              style={{
+                width: `${((step - 1) / (STEPS.length - 1)) * 100}%`,
+              }}
             />
           </div>
         </div>
@@ -157,7 +176,9 @@ export default function NewListingPage() {
 
       {/* Step content */}
       <div className="max-w-2xl mx-auto px-6 py-12 pb-32">
-        <p className="text-sm text-[#717171] mb-2">Step {step} of {STEPS.length}</p>
+        <p className="text-sm text-[#717171] mb-2">
+          Step {step} of {STEPS.length}
+        </p>
         <h1 className="text-3xl font-semibold text-[#222222] mb-10">
           {STEPS[step - 1].title}
         </h1>
@@ -200,6 +221,30 @@ export default function NewListingPage() {
                            transition-colors text-base resize-none"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-[#222222] mb-2">
+                Property type
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {LISTING_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => update("category", cat.value)}
+                    className={`p-4 rounded-xl border text-left transition-colors
+                      ${
+                        formValues.category === cat.value
+                          ? "border-[#222222] bg-[#F7F7F7]"
+                          : "border-[#DDDDDD] hover:border-[#222222]"
+                      }`}
+                  >
+                    <span className="text-sm font-medium text-[#222222]">
+                      {cat.label_en}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -212,7 +257,7 @@ export default function NewListingPage() {
             <input
               value={formValues.location}
               onChange={(e) => update("location", e.target.value)}
-              placeholder="e.g., Douala, Yaoundé, Bafoussam"
+              placeholder="e.g., Douala, Yaound&eacute;, Bafoussam"
               className="w-full px-4 py-3 border border-[#DDDDDD] rounded-xl text-[#222222]
                          placeholder-[#717171] focus:outline-none focus:border-[#222222]
                          transition-colors text-base"
@@ -233,12 +278,16 @@ export default function NewListingPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      update(key, String(Math.max(min, Number(formValues[key]) - 1)))
+                      update(
+                        key,
+                        String(Math.max(min, Number(formValues[key]) - 1))
+                      )
                     }
                     className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center
                                justify-center text-[#717171] hover:border-[#222222] hover:text-[#222222]
                                transition-colors text-lg disabled:opacity-30"
                     disabled={Number(formValues[key]) <= min}
+                    aria-label={`Decrease ${label}`}
                   >
                     −
                   </button>
@@ -253,6 +302,7 @@ export default function NewListingPage() {
                     className="w-8 h-8 rounded-full border border-[#DDDDDD] flex items-center
                                justify-center text-[#717171] hover:border-[#222222] hover:text-[#222222]
                                transition-colors text-lg"
+                    aria-label={`Increase ${label}`}
                   >
                     +
                   </button>
@@ -262,15 +312,46 @@ export default function NewListingPage() {
           </div>
         )}
 
-        {/* Step 4: Photos */}
+        {/* Step 4: Amenities */}
         {step === 4 && (
+          <div className="grid grid-cols-2 gap-3">
+            {AMENITIES.map((amenity) => {
+              const isSelected = selectedAmenities.includes(amenity.key);
+              return (
+                <button
+                  key={amenity.key}
+                  type="button"
+                  onClick={() => toggleAmenity(amenity.key)}
+                  className={`flex items-center gap-3 p-4 rounded-xl border transition-colors text-left
+                    ${
+                      isSelected
+                        ? "border-[#222222] bg-[#F7F7F7]"
+                        : "border-[#DDDDDD] hover:border-[#222222]"
+                    }`}
+                >
+                  <span className="text-sm font-medium text-[#222222]">
+                    {amenity.label_en}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Step 5: Photos */}
+        {step === 5 && (
           <div>
-            <label htmlFor="image-upload" className="block border-2 border-dashed border-[#DDDDDD] rounded-2xl p-16
-                            text-center hover:border-[#222222] transition-colors cursor-pointer">
+            <label
+              htmlFor="image-upload"
+              className="block border-2 border-dashed border-[#DDDDDD] rounded-2xl p-16
+                            text-center hover:border-[#222222] transition-colors cursor-pointer"
+            >
               <Upload className="w-10 h-10 mx-auto mb-4 text-[#717171]" />
-              <span className="text-[#FF385C] font-semibold block">Upload photos</span>
+              <span className="text-[#FF385C] font-semibold block">
+                Upload photos
+              </span>
               <p className="text-[#717171] text-sm mt-1">
-                PNG, JPG up to 4MB · max 10 photos
+                PNG, JPG up to 4MB &middot; max 10 photos
               </p>
             </label>
             <input
@@ -283,22 +364,29 @@ export default function NewListingPage() {
               disabled={uploading}
             />
             {uploading && (
-              <p className="text-sm text-[#717171] mt-3 text-center">Uploading…</p>
+              <p className="text-sm text-[#717171] mt-3 text-center">
+                Uploading…
+              </p>
             )}
             {images.length > 0 && (
               <div className="mt-4">
                 <p className="text-sm text-green-600 font-medium mb-3">
-                  ✓ {images.length} photo{images.length !== 1 ? "s" : ""} uploaded
+                  {images.length} photo{images.length !== 1 ? "s" : ""} uploaded
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <div
                       key={i}
-                      src={url}
-                      alt={`Upload ${i + 1}`}
-                      className="aspect-square object-cover rounded-lg"
-                    />
+                      className="relative aspect-square rounded-lg overflow-hidden"
+                    >
+                      <Image
+                        src={url}
+                        alt={`Upload ${i + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 33vw, 200px"
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -306,8 +394,8 @@ export default function NewListingPage() {
           </div>
         )}
 
-        {/* Step 5: Pricing */}
-        {step === 5 && (
+        {/* Step 6: Pricing */}
+        {step === 6 && (
           <div>
             <label className="block text-sm font-semibold text-[#222222] mb-2">
               Price per night (XAF)
@@ -320,7 +408,7 @@ export default function NewListingPage() {
                 type="number"
                 value={formValues.price_per_night}
                 onChange={(e) => update("price_per_night", e.target.value)}
-                min="1"
+                min="1000"
                 placeholder="0"
                 className="w-full pl-16 pr-4 py-4 border border-[#DDDDDD] rounded-xl text-[#222222]
                            text-2xl font-semibold focus:outline-none focus:border-[#222222]
@@ -328,13 +416,17 @@ export default function NewListingPage() {
               />
             </div>
             <p className="text-sm text-[#717171] mt-2">
-              Set a competitive price to attract your first guests.
+              Set a competitive price to attract your first guests. Minimum
+              1,000 FCFA.
             </p>
             <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <p className="text-sm text-amber-800 font-medium">📋 What happens next?</p>
+              <p className="text-sm text-amber-800 font-medium">
+                What happens next?
+              </p>
               <p className="text-sm text-amber-700 mt-1">
-                After you submit, our team will review your listing within 24–48 hours.
-                You&apos;ll be notified once it&apos;s approved and live on the platform.
+                After you submit, our team will review your listing within 24–48
+                hours. You&apos;ll be notified once it&apos;s approved and live
+                on the platform.
               </p>
             </div>
           </div>
@@ -345,7 +437,10 @@ export default function NewListingPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD] z-40">
         <div className="max-w-2xl mx-auto px-6 py-4 flex justify-between items-center">
           <button
-            onClick={() => { setStep((s) => Math.max(1, s - 1)); setError(null); }}
+            onClick={() => {
+              setStep((s) => Math.max(1, s - 1));
+              setError(null);
+            }}
             disabled={step === 1}
             className="px-6 py-3 border border-[#222222] rounded-xl text-[#222222]
                        font-medium hover:bg-[#F7F7F7] disabled:opacity-40 disabled:cursor-not-allowed
@@ -356,7 +451,10 @@ export default function NewListingPage() {
 
           {step < STEPS.length ? (
             <button
-              onClick={() => { setStep((s) => Math.min(STEPS.length, s + 1)); setError(null); }}
+              onClick={() => {
+                setStep((s) => Math.min(STEPS.length, s + 1));
+                setError(null);
+              }}
               className="px-8 py-3 bg-[#222222] text-white rounded-xl font-medium
                          hover:bg-black transition-colors"
             >

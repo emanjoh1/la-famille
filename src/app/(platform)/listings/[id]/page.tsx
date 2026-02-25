@@ -1,5 +1,9 @@
 import { getListing } from "@/actions/listings";
+import { getListingReviews, getAverageRating } from "@/actions/reviews";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import {
   Star,
   Wifi,
@@ -13,13 +17,14 @@ import {
   ShieldCheck,
   Fence,
   Flame,
-  Share,
-  Heart,
   WashingMachine,
 } from "lucide-react";
 import { AMENITIES } from "@/lib/utils/constants";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { ImageGallery } from "@/components/listings/ImageGallery";
+import { ReviewList } from "@/components/reviews/ReviewList";
+import { SaveButton } from "@/components/listings/SaveButton";
+import { ShareButton } from "@/components/listings/ShareButton";
 import type { LucideIcon } from "lucide-react";
 
 const AMENITY_ICONS: Record<string, LucideIcon> = {
@@ -37,6 +42,26 @@ const AMENITY_ICONS: Record<string, LucideIcon> = {
   hot_water: Flame,
 };
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const listing = await getListing(id);
+    return {
+      title: `${listing.title} | La Famille`,
+      description: listing.description?.slice(0, 160),
+      openGraph: {
+        images: listing.images?.[0] ? [listing.images[0]] : [],
+      },
+    };
+  } catch {
+    return { title: "Listing | La Famille" };
+  }
+}
+
 export default async function ListingDetailPage({
   params,
 }: {
@@ -50,6 +75,24 @@ export default async function ListingDetailPage({
     notFound();
   }
 
+  const [reviews, ratingData] = await Promise.all([
+    getListingReviews(id),
+    getAverageRating(id),
+  ]);
+
+  // Check if user has saved this listing
+  const { userId } = await auth();
+  let isSaved = false;
+  if (userId) {
+    const { data } = await supabaseAdmin
+      .from("favorites")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("listing_id", id)
+      .single();
+    isSaved = !!data;
+  }
+
   const amenityDetails = AMENITIES.filter((a) =>
     listing.amenities?.includes(a.key)
   );
@@ -58,14 +101,12 @@ export default async function ListingDetailPage({
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Title row */}
       <div className="flex items-start justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-[#222222] flex-1 pr-4">{listing.title}</h1>
+        <h1 className="text-2xl font-semibold text-[#222222] flex-1 pr-4">
+          {listing.title}
+        </h1>
         <div className="flex items-center gap-4 flex-shrink-0">
-          <button className="flex items-center gap-1.5 text-sm font-medium text-[#222222] underline hover:text-[#717171] transition-colors">
-            <Share className="w-4 h-4" /> Share
-          </button>
-          <button className="flex items-center gap-1.5 text-sm font-medium text-[#222222] underline hover:text-[#717171] transition-colors">
-            <Heart className="w-4 h-4" /> Save
-          </button>
+          <ShareButton title={listing.title} />
+          <SaveButton listingId={id} initialSaved={isSaved} />
         </div>
       </div>
 
@@ -78,11 +119,14 @@ export default async function ListingDetailPage({
         <div>
           {/* Location + quick stats */}
           <div className="pb-6 border-b border-[#DDDDDD]">
-            <h2 className="text-xl font-semibold text-[#222222] mb-1">{listing.location}</h2>
+            <h2 className="text-xl font-semibold text-[#222222] mb-1">
+              {listing.location}
+            </h2>
             <p className="text-[#717171]">
               {listing.bedrooms} bedroom{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
-              {listing.bathrooms} bathroom{listing.bathrooms !== 1 ? "s" : ""} ·{" "}
-              Up to {listing.max_guests} guest{listing.max_guests !== 1 ? "s" : ""}
+              {listing.bathrooms} bathroom{listing.bathrooms !== 1 ? "s" : ""} ·
+              Up to {listing.max_guests} guest
+              {listing.max_guests !== 1 ? "s" : ""}
             </p>
           </div>
 
@@ -92,8 +136,12 @@ export default async function ListingDetailPage({
               <span className="text-white font-semibold text-sm">H</span>
             </div>
             <div>
-              <p className="font-medium text-[#222222]">Hosted by a La Famille host</p>
-              <p className="text-sm text-[#717171]">Superhost · 3 years hosting</p>
+              <p className="font-medium text-[#222222]">
+                Hosted by a La Famille host
+              </p>
+              <p className="text-sm text-[#717171]">
+                Superhost · 3 years hosting
+              </p>
             </div>
           </div>
 
@@ -114,9 +162,14 @@ export default async function ListingDetailPage({
                 {amenityDetails.map((amenity) => {
                   const Icon = AMENITY_ICONS[amenity.key] ?? Wifi;
                   return (
-                    <div key={amenity.key} className="flex items-center gap-4">
+                    <div
+                      key={amenity.key}
+                      className="flex items-center gap-4"
+                    >
                       <Icon className="w-5 h-5 text-[#222222] flex-shrink-0" />
-                      <span className="text-[#222222]">{amenity.label_en}</span>
+                      <span className="text-[#222222]">
+                        {amenity.label_en}
+                      </span>
                     </div>
                   );
                 })}
@@ -124,16 +177,27 @@ export default async function ListingDetailPage({
             </div>
           )}
 
-          {/* Reviews summary */}
+          {/* Reviews */}
           <div className="py-6">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-6">
               <Star className="w-5 h-5 fill-[#222222] text-[#222222]" />
-              <span className="text-xl font-semibold text-[#222222]">4.92</span>
-              <span className="text-[#222222]">· 12 reviews</span>
+              {ratingData ? (
+                <>
+                  <span className="text-xl font-semibold text-[#222222]">
+                    {ratingData.average.toFixed(2)}
+                  </span>
+                  <span className="text-[#222222]">
+                    · {ratingData.count} review
+                    {ratingData.count !== 1 ? "s" : ""}
+                  </span>
+                </>
+              ) : (
+                <span className="text-xl font-semibold text-[#222222]">
+                  New
+                </span>
+              )}
             </div>
-            <p className="text-[#717171] text-sm">
-              Reviews will appear here once guests leave feedback.
-            </p>
+            <ReviewList reviews={reviews} />
           </div>
         </div>
 
@@ -146,8 +210,10 @@ export default async function ListingDetailPage({
       </div>
 
       {/* Mobile sticky bottom bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD]
-                      px-6 py-4 flex items-center justify-between z-50">
+      <div
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD]
+                      px-6 py-4 flex items-center justify-between z-50"
+      >
         <div>
           <span className="font-semibold text-[#222222]">
             {listing.price_per_night.toLocaleString()} XAF

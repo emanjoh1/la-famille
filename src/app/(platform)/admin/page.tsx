@@ -1,152 +1,154 @@
-import { getAllListingsAdmin } from "@/actions/listings";
+import { getAdminAnalytics } from "@/actions/admin";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import AdminActions from "./AdminActions";
+import Link from "next/link";
+import { BarChart3, Users, Home, DollarSign, Calendar } from "lucide-react";
+
+export const metadata = {
+  title: "Admin Dashboard | La Famille",
+  description: "Platform analytics and management",
+};
 
 export default async function AdminPage() {
   const { userId } = await auth();
   if (!userId) redirect("/auth");
 
-  // Read publicMetadata directly from Clerk (not from JWT session claims,
-  // which don't include publicMetadata unless the session token is customised).
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
   const role = user.publicMetadata?.role as string | undefined;
   if (role !== "admin") redirect("/explore");
 
-  const listings = await getAllListingsAdmin();
-
-  const pending = listings.filter((l) => l.status === "pending_review");
-  const approved = listings.filter((l) => l.status === "approved");
-  const rejected = listings.filter((l) => l.status === "rejected");
+  const analytics = await getAdminAnalytics();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-2">Admin — Listings</h1>
-      <p className="text-[#717171] mb-8">
-        Review and approve host submissions before they go live.
-      </p>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-semibold text-[#222222] mb-2">Admin Dashboard</h1>
+      <p className="text-[#717171] mb-8">Platform overview and management</p>
 
-      {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
-        {[
-          { label: "Pending review", count: pending.length, color: "bg-amber-50 border-amber-200 text-amber-800" },
-          { label: "Approved", count: approved.length, color: "bg-green-50 border-green-200 text-green-800" },
-          { label: "Rejected", count: rejected.length, color: "bg-red-50 border-red-200 text-red-800" },
-        ].map(({ label, count, color }) => (
-          <div key={label} className={`border rounded-xl p-4 ${color}`}>
-            <p className="text-3xl font-bold">{count}</p>
-            <p className="text-sm font-medium mt-1">{label}</p>
-          </div>
-        ))}
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <StatCard
+          icon={<DollarSign className="w-6 h-6" />}
+          label="Total Revenue"
+          value={`${analytics.totalRevenue.toLocaleString()} XAF`}
+          subtext={`Commission: ${analytics.platformCommission.toLocaleString()} XAF`}
+          color="bg-green-50 text-green-600"
+        />
+        <StatCard
+          icon={<Calendar className="w-6 h-6" />}
+          label="Bookings"
+          value={analytics.bookingStats.total.toString()}
+          subtext={`${analytics.bookingStats.confirmed} confirmed`}
+          color="bg-blue-50 text-blue-600"
+        />
+        <StatCard
+          icon={<Home className="w-6 h-6" />}
+          label="Listings"
+          value={analytics.listingStats.total.toString()}
+          subtext={`${analytics.listingStats.pending} pending review`}
+          color="bg-purple-50 text-purple-600"
+        />
+        <StatCard
+          icon={<Users className="w-6 h-6" />}
+          label="Users"
+          value={analytics.userStats.total.toString()}
+          subtext={`${analytics.userStats.hosts} hosts`}
+          color="bg-amber-50 text-amber-600"
+        />
       </div>
 
-      {/* Pending first */}
-      <Section title="⏳ Pending Review" listings={pending} showActions />
-      <Section title="✅ Approved" listings={approved} showActions={false} />
-      <Section title="❌ Rejected" listings={rejected} showActions={false} />
+      {/* Navigation Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <NavCard
+          href="/admin/listings"
+          icon={<Home className="w-8 h-8" />}
+          title="Listings Management"
+          description="Review and approve property listings"
+          badge={analytics.listingStats.pending > 0 ? analytics.listingStats.pending : undefined}
+        />
+        <NavCard
+          href="/admin/bookings"
+          icon={<Calendar className="w-8 h-8" />}
+          title="Bookings"
+          description="View and manage all bookings"
+          badge={analytics.bookingStats.pending > 0 ? analytics.bookingStats.pending : undefined}
+        />
+        <NavCard
+          href="/admin/users"
+          icon={<Users className="w-8 h-8" />}
+          title="User Management"
+          description="Manage users and roles"
+        />
+        <NavCard
+          href="/admin/analytics"
+          icon={<BarChart3 className="w-8 h-8" />}
+          title="Analytics"
+          description="Detailed platform analytics"
+        />
+        <NavCard
+          href="/admin/financial"
+          icon={<DollarSign className="w-8 h-8" />}
+          title="Financial Reports"
+          description="Revenue and commission reports"
+        />
+      </div>
     </div>
   );
 }
 
-function Section({
-  title,
-  listings,
-  showActions,
+function StatCard({
+  icon,
+  label,
+  value,
+  subtext,
+  color,
 }: {
-  title: string;
-  listings: {
-    id: string;
-    title: string;
-    location: string;
-    price_per_night: number;
-    bedrooms: number;
-    bathrooms: number;
-    max_guests: number;
-    images: string[];
-    status: string;
-    rejection_reason?: string | null;
-    created_at: string;
-  }[];
-  showActions: boolean;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  subtext: string;
+  color: string;
 }) {
-  if (listings.length === 0) return null;
-
   return (
-    <div className="mb-12">
-      <h2 className="text-lg font-semibold text-[#222222] mb-4">{title}</h2>
-      <div className="space-y-4">
-        {listings.map((listing) => (
-          <div
-            key={listing.id}
-            className="border border-[#DDDDDD] rounded-2xl overflow-hidden flex flex-col sm:flex-row"
-          >
-            {/* Thumbnail */}
-            <div className="w-full sm:w-44 h-40 sm:h-44 flex-shrink-0 bg-[#F7F7F7] flex items-center justify-center overflow-hidden">
-              {listing.images[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={listing.images[0]}
-                  alt={listing.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-[#717171] text-sm">No photo</span>
-              )}
-            </div>
-
-            {/* Details */}
-            <div className="flex-1 p-5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-start justify-between gap-4 mb-1">
-                  <h3 className="font-semibold text-[#222222] text-lg leading-tight">
-                    {listing.title}
-                  </h3>
-                  <StatusBadge status={listing.status} />
-                </div>
-                <p className="text-sm text-[#717171] mb-3">{listing.location}</p>
-                <p className="text-sm text-[#222222]">
-                  {listing.bedrooms} bed · {listing.bathrooms} bath · {listing.max_guests} guests ·{" "}
-                  <span className="font-medium">
-                    {listing.price_per_night.toLocaleString()} XAF / night
-                  </span>
-                </p>
-                {listing.rejection_reason && (
-                  <p className="text-sm text-red-600 mt-2">
-                    Rejection reason: {listing.rejection_reason}
-                  </p>
-                )}
-              </div>
-
-              {showActions && (
-                <div className="mt-4">
-                  <AdminActions listingId={listing.id} />
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+    <div className="border border-[#DDDDDD] rounded-2xl p-6">
+      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4`}>
+        {icon}
       </div>
+      <p className="text-sm text-[#717171] mb-1">{label}</p>
+      <p className="text-2xl font-bold text-[#222222] mb-1">{value}</p>
+      <p className="text-xs text-[#717171]">{subtext}</p>
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    pending_review: "bg-amber-100 text-amber-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
-  };
-  const labels: Record<string, string> = {
-    pending_review: "Pending",
-    approved: "Approved",
-    rejected: "Rejected",
-  };
+function NavCard({
+  href,
+  icon,
+  title,
+  description,
+  badge,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  badge?: number;
+}) {
   return (
-    <span
-      className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${styles[status] ?? "bg-gray-100 text-gray-700"}`}
+    <Link
+      href={href}
+      className="border border-[#DDDDDD] rounded-2xl p-6 hover:shadow-lg transition-shadow group relative"
     >
-      {labels[status] ?? status}
-    </span>
+      {badge && (
+        <span className="absolute top-4 right-4 bg-[#FF385C] text-white text-xs font-bold px-2 py-1 rounded-full">
+          {badge}
+        </span>
+      )}
+      <div className="text-[#717171] group-hover:text-[#FF385C] transition-colors mb-4">
+        {icon}
+      </div>
+      <h3 className="text-lg font-semibold text-[#222222] mb-2">{title}</h3>
+      <p className="text-sm text-[#717171]">{description}</p>
+    </Link>
   );
 }

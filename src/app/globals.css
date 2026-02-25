@@ -1,14 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --color-airbnb: #FF385C;
-  --color-airbnb-dark: #E31C5F;
-  --color-text-primary: #222222;
-  --color-text-secondary: #717171;
-  --color-border: #DDDDDD;
-  --color-hover-bg: #F7F7F7;
-  --background: #ffffff;
-  --foreground: #222222;
+  --color-primary: #FF385C;
+  --color-primary-dark: #E31C5F;
+  --color-primary-light: #FF5A7A;
+  --color-secondary: #00A699;
+  --color-secondary-dark: #008A80;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-hover-bg: #F9FAFB;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --background: #FFFFFF;
+  --background-secondary: #FAFAFA;
+  --foreground: #1A1A1A;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
 @theme inline {
@@ -20,7 +37,47 @@
 body {
   background: var(--background);
   color: var(--color-text-primary);
-  font-family: var(--font-inter), Inter, sans-serif;
+  font-family: var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-tap-highlight-color: rgba(255, 56, 92, 0.1);
+  -webkit-touch-callout: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile-friendly touch targets */
+button, a[role="button"], input[type="button"], input[type="submit"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Enhanced button styles */
+button, a[role="button"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active:not(:disabled), a[role="button"]:active {
+  transform: scale(0.98);
+}
+
+/* Input focus styles */
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling for mobile */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area for notched devices */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
 }
 
 .no-scrollbar::-webkit-scrollbar {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Building2,
   Home,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { LISTING_CATEGORIES } from "@/lib/utils/constants";
 import type { LucideIcon } from "lucide-react";
+import { memo, useCallback } from "react";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Building2,
@@ -22,8 +23,23 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Hotel,
 };
 
-export function CategoryBar() {
-  const [active, setActive] = useState<string | null>(null);
+function CategoryBarInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const active = searchParams.get("category");
+
+  const handleCategoryClick = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (active === value) {
+        params.delete("category");
+      } else {
+        params.set("category", value);
+      }
+      router.push(`/explore?${params.toString()}`);
+    },
+    [active, router, searchParams]
+  );
 
   return (
     <div className="sticky top-20 bg-white border-b border-[#DDDDDD] z-40">
@@ -37,7 +53,7 @@ export function CategoryBar() {
               return (
                 <button
                   key={cat.value}
-                  onClick={() => setActive(isActive ? null : cat.value)}
+                  onClick={() => handleCategoryClick(cat.value)}
                   className={`flex flex-col items-center gap-1.5 pb-2 border-b-2 flex-shrink-0
                               transition-all duration-150
                               ${
@@ -47,7 +63,9 @@ export function CategoryBar() {
                               }`}
                 >
                   <Icon className="w-6 h-6" />
-                  <span className={`text-xs whitespace-nowrap ${isActive ? "font-semibold" : "font-medium"}`}>
+                  <span
+                    className={`text-xs whitespace-nowrap ${isActive ? "font-semibold" : "font-medium"}`}
+                  >
                     {cat.label_en}
                   </span>
                 </button>
@@ -70,3 +88,5 @@ export function CategoryBar() {
     </div>
   );
 }
+
+export const CategoryBar = memo(CategoryBarInner);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Star, AlertCircle } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import { createBooking } from "@/actions/bookings";
@@ -24,13 +24,15 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
 
   const today = new Date().toISOString().split("T")[0];
 
-  const nights =
-    checkIn && checkOut
-      ? Math.max(0, differenceInDays(new Date(checkOut), new Date(checkIn)))
-      : 0;
-  const subtotal = nights * listing.price_per_night;
-  const serviceFee = Math.round(subtotal * 0.14);
-  const total = subtotal + serviceFee;
+  const { nights, subtotal, serviceFee, total } = useMemo(() => {
+    const n =
+      checkIn && checkOut
+        ? Math.max(0, differenceInDays(new Date(checkOut), new Date(checkIn)))
+        : 0;
+    const sub = n * listing.price_per_night;
+    const fee = Math.round(sub * 0.14);
+    return { nights: n, subtotal: sub, serviceFee: fee, total: sub + fee };
+  }, [checkIn, checkOut, listing.price_per_night]);
 
   const handleReserve = async () => {
     setError(null);
@@ -44,45 +46,68 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
     }
     setLoading(true);
     try {
-      await createBooking({
+      // Create booking
+      const booking = await createBooking({
         listing_id: listing.id,
         check_in: checkIn,
         check_out: checkOut,
-        total_price: total,
         guests,
       });
-      router.push("/bookings");
+
+      // Create Stripe checkout session
+      const response = await fetch("/api/bookings/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          listingTitle: `Booking for ${nights} night${nights !== 1 ? "s" : ""}`,
+          totalPrice: total,
+        }),
+      });
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url; // Redirect to Stripe checkout
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
+      
+      // If unauthorized, redirect to login
+      if (msg === "Unauthorized") {
+        router.push("/auth?redirect=" + encodeURIComponent(window.location.pathname));
+        return;
+      }
+      
       setError(msg);
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="border border-[#DDDDDD] rounded-2xl p-6 shadow-lg">
+    <div className="border border-gray-200 rounded-2xl p-6 shadow-lg bg-white hover:shadow-xl transition-shadow duration-200">
       {/* Price + Rating */}
       <div className="flex items-baseline justify-between mb-6">
         <div>
-          <span className="text-2xl font-semibold text-[#222222]">
+          <span className="text-2xl font-bold text-gray-900">
             {listing.price_per_night.toLocaleString()} XAF
           </span>
-          <span className="text-[#717171]"> / night</span>
+          <span className="text-gray-500"> / night</span>
         </div>
-        <div className="flex items-center gap-1 text-sm">
-          <Star className="w-3.5 h-3.5 fill-[#222222] text-[#222222]" />
-          <span className="font-medium text-[#222222]">New</span>
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg">
+          <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+          <span className="text-sm font-semibold text-gray-900">New</span>
         </div>
       </div>
 
       {/* Date + Guest inputs */}
-      <div className="border border-[#DDDDDD] rounded-xl overflow-hidden mb-4">
-        <div className="grid grid-cols-2 divide-x divide-[#DDDDDD]">
-          <div className="p-3">
-            <p className="text-xs font-semibold text-[#222222] uppercase tracking-wide mb-1">
+      <div className="border border-gray-200 rounded-xl overflow-hidden mb-4 hover:border-gray-300 transition-colors">
+        <div className="grid grid-cols-2 divide-x divide-gray-200">
+          <div className="p-3 hover:bg-gray-50 transition-colors">
+            <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
               Check in
-            </p>
+            </label>
             <input
               type="date"
               value={checkIn}
@@ -92,14 +117,14 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setError(null);
                 if (checkOut && e.target.value >= checkOut) setCheckOut("");
               }}
-              className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
+              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
               required
             />
           </div>
-          <div className="p-3">
-            <p className="text-xs font-semibold text-[#222222] uppercase tracking-wide mb-1">
+          <div className="p-3 hover:bg-gray-50 transition-colors">
+            <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
               Check out
-            </p>
+            </label>
             <input
               type="date"
               value={checkOut}
@@ -108,26 +133,28 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setCheckOut(e.target.value);
                 setError(null);
               }}
-              className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
+              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
               required
               disabled={!checkIn}
             />
           </div>
         </div>
-        <div className="border-t border-[#DDDDDD] p-3">
-          <p className="text-xs font-semibold text-[#222222] uppercase tracking-wide mb-1">
+        <div className="border-t border-gray-200 p-3 hover:bg-gray-50 transition-colors">
+          <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
             Guests
-          </p>
+          </label>
           <select
             value={guests}
             onChange={(e) => setGuests(Number(e.target.value))}
-            className="w-full text-sm text-[#222222] bg-transparent focus:outline-none cursor-pointer"
+            className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
           >
-            {Array.from({ length: listing.max_guests }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>
-                {n} guest{n !== 1 ? "s" : ""}
-              </option>
-            ))}
+            {Array.from({ length: listing.max_guests }, (_, i) => i + 1).map(
+              (n) => (
+                <option key={n} value={n}>
+                  {n} guest{n !== 1 ? "s" : ""}
+                </option>
+              )
+            )}
           </select>
         </div>
       </div>
@@ -144,28 +171,32 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       <button
         onClick={handleReserve}
         disabled={loading}
-        className="w-full py-3.5 bg-gradient-to-r from-[#E61E4D] to-[#FF385C] text-white
-                   font-semibold rounded-xl hover:from-[#D01243] hover:to-[#E31C5F]
-                   transition-all mb-4 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full py-4 bg-gradient-to-r from-[#FF385C] to-[#E31C5F] text-white
+                   font-bold text-base rounded-xl hover:from-[#E31C5F] hover:to-[#D01243]
+                   transition-all duration-200 mb-4 disabled:opacity-60 disabled:cursor-not-allowed
+                   shadow-md hover:shadow-lg hover:scale-[1.02]"
       >
         {loading ? "Reserving…" : "Reserve"}
       </button>
-      <p className="text-center text-sm text-[#717171] mb-4">You won&apos;t be charged yet</p>
+      <p className="text-center text-sm text-gray-600 mb-4">
+        You won&apos;t be charged yet
+      </p>
 
       {/* Price breakdown */}
       {nights > 0 && (
-        <div className="space-y-3">
-          <div className="flex justify-between text-[#222222] text-sm">
-            <span className="underline">
-              {listing.price_per_night.toLocaleString()} XAF × {nights} night{nights !== 1 ? "s" : ""}
+        <div className="space-y-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-between text-gray-900 text-sm">
+            <span className="underline decoration-gray-400">
+              {listing.price_per_night.toLocaleString()} XAF × {nights} night
+              {nights !== 1 ? "s" : ""}
             </span>
-            <span>{subtotal.toLocaleString()} XAF</span>
+            <span className="font-semibold">{subtotal.toLocaleString()} XAF</span>
           </div>
-          <div className="flex justify-between text-[#222222] text-sm">
-            <span className="underline">La Famille service fee</span>
-            <span>{serviceFee.toLocaleString()} XAF</span>
+          <div className="flex justify-between text-gray-900 text-sm">
+            <span className="underline decoration-gray-400">La Famille service fee</span>
+            <span className="font-semibold">{serviceFee.toLocaleString()} XAF</span>
           </div>
-          <div className="border-t border-[#DDDDDD] pt-3 flex justify-between font-semibold text-[#222222]">
+          <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-900 text-base">
             <span>Total before taxes</span>
             <span>{total.toLocaleString()} XAF</span>
           </div>

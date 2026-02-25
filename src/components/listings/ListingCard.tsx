@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Star } from "lucide-react";
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { toggleFavorite } from "@/actions/favorites";
 
 interface ListingCardProps {
@@ -15,10 +15,10 @@ interface ListingCardProps {
   price_per_night: number;
   images: string[];
   isFavorited?: boolean;
-  rating?: number;
+  rating?: number | null;
 }
 
-export function ListingCard({
+function ListingCardInner({
   id,
   location,
   title,
@@ -27,20 +27,24 @@ export function ListingCard({
   price_per_night,
   images,
   isFavorited = false,
-  rating = 4.92,
+  rating,
 }: ListingCardProps) {
   const [hearted, setHearted] = useState(isFavorited);
 
-  const handleHeart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setHearted(!hearted);
-    try {
-      await toggleFavorite(id);
-    } catch {
-      setHearted(hearted); // revert on error
-    }
-  };
+  const handleHeart = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const prev = hearted;
+      setHearted(!prev);
+      try {
+        await toggleFavorite(id);
+      } catch {
+        setHearted(prev); // revert on error
+      }
+    },
+    [hearted, id]
+  );
 
   return (
     <Link href={`/listings/${id}`} className="group cursor-pointer block">
@@ -78,21 +82,32 @@ export function ListingCard({
       {/* Details */}
       <div className="space-y-1">
         <div className="flex justify-between items-start">
-          <h3 className="font-semibold text-[#222222] truncate pr-2">{location}</h3>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 fill-[#222222] text-[#222222]" />
-            <span className="text-sm text-[#222222]">{rating}</span>
-          </div>
+          <h3 className="font-semibold text-[#222222] truncate pr-2">
+            {location}
+          </h3>
+          {rating != null && (
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Star className="w-3.5 h-3.5 fill-[#222222] text-[#222222]" />
+              <span className="text-sm text-[#222222]">
+                {rating.toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
         <p className="text-[#717171] text-sm truncate">{title}</p>
         <p className="text-[#717171] text-sm">
-          {bedrooms} bed{bedrooms !== 1 ? "s" : ""} · {bathrooms} bath{bathrooms !== 1 ? "s" : ""}
+          {bedrooms} bed{bedrooms !== 1 ? "s" : ""} · {bathrooms} bath
+          {bathrooms !== 1 ? "s" : ""}
         </p>
         <p className="text-[#222222]">
-          <span className="font-semibold">{price_per_night.toLocaleString()} XAF</span>
+          <span className="font-semibold">
+            {price_per_night.toLocaleString()} XAF
+          </span>
           <span className="font-normal text-[#717171]"> / night</span>
         </p>
       </div>
     </Link>
   );
 }
+
+export const ListingCard = memo(ListingCardInner);

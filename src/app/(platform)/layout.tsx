@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import { Navbar } from "@/components/layout/Navbar";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { PageSkeleton } from "@/components/ui/PageSkeleton";
 
 export default function PlatformLayout({
   children,
@@ -8,7 +11,10 @@ export default function PlatformLayout({
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>{children}</main>
+      <main className="pb-20 lg:pb-0">
+        <Suspense fallback={<PageSkeleton />}>{children}</Suspense>
+      </main>
+      <MobileBottomNav />
     </div>
   );
 }

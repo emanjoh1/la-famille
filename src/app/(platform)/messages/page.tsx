@@ -2,6 +2,11 @@ import { getUserConversations } from "@/actions/messages";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
+export const metadata = {
+  title: "Messages | La Famille",
+  description: "Your conversations on La Famille",
+};
+
 export default async function MessagesPage() {
   const conversations = await getUserConversations();
 

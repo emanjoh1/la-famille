@@ -1,6 +1,12 @@
 import { getUserBookings } from "@/actions/bookings";
 import { format } from "date-fns";
 import Link from "next/link";
+import Image from "next/image";
+
+export const metadata = {
+  title: "Trips | La Famille",
+  description: "View your upcoming and past trips on La Famille",
+};
 
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "bg-green-50 text-green-700 border border-green-200",
@@ -44,11 +50,12 @@ export default async function BookingsPage() {
             >
               <div className="relative w-40 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
                 {booking.listings?.images?.[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={booking.listings.images[0]}
                     alt={booking.listings.title ?? "Listing"}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="160px"
                   />
                 ) : (
                   <span className="text-3xl">🏠</span>

@@ -16,7 +16,11 @@ export async function toggleFavorite(listingId: string) {
     .single();
 
   if (existing) {
-    await supabaseAdmin.from("favorites").delete().eq("id", existing.id);
+    await supabaseAdmin
+      .from("favorites")
+      .delete()
+      .eq("id", existing.id)
+      .eq("user_id", userId); // Defense-in-depth: ensure ownership
   } else {
     await supabaseAdmin
       .from("favorites")
@@ -33,7 +37,9 @@ export async function getUserFavorites() {
 
   const { data, error } = await supabaseAdmin
     .from("favorites")
-    .select("*, listings(*)")
+    .select(
+      "id, created_at, listings(id, title, location, bedrooms, bathrooms, price_per_night, images, max_guests)"
+    )
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 

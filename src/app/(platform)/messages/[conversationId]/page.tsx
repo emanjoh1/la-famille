@@ -11,6 +11,11 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { Send, MessageCircle } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
+import type { Message, Conversation } from "@/types/database";
+
+interface ConversationWithListing extends Conversation {
+  listings?: { id: string; title: string; location: string; images?: string[] } | null;
+}
 
 export default function ConversationPage({
   params,
@@ -18,9 +23,9 @@ export default function ConversationPage({
   params: { conversationId: string };
 }) {
   const { userId } = useAuth();
-  const [messages, setMessages] = useState<any[]>([]);
-  const [conversation, setConversation] = useState<any>(null);
-  const [conversations, setConversations] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversation, setConversation] = useState<ConversationWithListing | null>(null);
+  const [conversations, setConversations] = useState<ConversationWithListing[]>([]);
   const [content, setContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

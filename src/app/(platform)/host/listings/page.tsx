@@ -1,17 +1,25 @@
 import { getUserListings } from "@/actions/listings";
 import Link from "next/link";
+import Image from "next/image";
 import { Plus } from "lucide-react";
+
+export const metadata = {
+  title: "Your Listings | La Famille",
+  description: "Manage your property listings on La Famille",
+};
 
 const STATUS_STYLES: Record<string, string> = {
   pending_review: "bg-amber-100 text-amber-800",
   approved:       "bg-green-100 text-green-800",
   rejected:       "bg-red-100 text-red-800",
+  snoozed:        "bg-gray-100 text-gray-800",
 };
 
 const STATUS_LABELS: Record<string, string> = {
   pending_review: "Under review",
   approved:       "Live",
   rejected:       "Rejected",
+  snoozed:        "Snoozed",
 };
 
 export default async function HostListingsPage() {
@@ -53,11 +61,12 @@ export default async function HostListingsPage() {
             <div key={listing.id} className="group cursor-pointer">
               <div className="relative aspect-square mb-3 rounded-2xl overflow-hidden bg-[#F7F7F7]">
                 {listing.images[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={listing.images[0]}
                     alt={listing.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#717171] text-sm">
@@ -75,19 +84,17 @@ export default async function HostListingsPage() {
                   </span>
                 </div>
 
-                {/* View overlay — only for approved */}
-                {listing.status === "approved" && (
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <Link
-                      href={`/listings/${listing.id}`}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity
-                                 px-4 py-2 bg-white rounded-xl text-sm font-medium
-                                 text-[#222222] hover:bg-[#F7F7F7]"
-                    >
-                      View listing
-                    </Link>
-                  </div>
-                )}
+                {/* Edit overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <Link
+                    href={`/host/listings/${listing.id}/edit`}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity
+                               px-4 py-2 bg-white rounded-xl text-sm font-medium
+                               text-[#222222] hover:bg-[#F7F7F7]"
+                  >
+                    Edit listing
+                  </Link>
+                </div>
               </div>
 
               <div className="space-y-1">

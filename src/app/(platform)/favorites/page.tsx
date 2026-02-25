@@ -3,6 +3,11 @@ import { ListingCard } from "@/components/listings/ListingCard";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 
+export const metadata = {
+  title: "Wishlists | La Famille",
+  description: "Your saved properties on La Famille",
+};
+
 export default async function FavoritesPage() {
   const favorites = await getUserFavorites();
 
