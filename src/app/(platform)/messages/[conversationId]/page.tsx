@@ -45,7 +45,10 @@ export default function ConversationPage({
     ]);
     setConversation(conv);
     setMessages(msgs);
-    setConversations(allConvs);
+    setConversations(allConvs.map(c => ({
+      ...c,
+      listings: Array.isArray(c.listings) ? c.listings[0] : c.listings
+    })));
   };
 
   const handleSend = async (e: React.FormEvent) => {
