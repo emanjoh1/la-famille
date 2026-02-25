@@ -34,19 +34,22 @@ export default async function FavoritesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {favorites.map((fav) => (
-            <ListingCard
-              key={fav.id}
-              id={fav.listings.id}
-              location={fav.listings.location}
-              title={fav.listings.title}
-              bedrooms={fav.listings.bedrooms}
-              bathrooms={fav.listings.bathrooms}
-              price_per_night={fav.listings.price_per_night}
-              images={fav.listings.images}
-              isFavorited={true}
-            />
-          ))}
+          {favorites.map((fav) => {
+            const listing = Array.isArray(fav.listings) ? fav.listings[0] : fav.listings;
+            return (
+              <ListingCard
+                key={fav.id}
+                id={listing.id}
+                location={listing.location}
+                title={listing.title}
+                bedrooms={listing.bedrooms}
+                bathrooms={listing.bathrooms}
+                price_per_night={listing.price_per_night}
+                images={listing.images}
+                isFavorited={true}
+              />
+            );
+          })}
         </div>
       )}
     </div>
