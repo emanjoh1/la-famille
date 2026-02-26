@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/provider";
@@ -10,6 +10,14 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#1E3A8A",
+};
+
 export const metadata: Metadata = {
   title: "La Famille - Property Rentals in Cameroon",
   description:
@@ -20,13 +28,6 @@ export const metadata: Metadata = {
       "Find and rent unique properties across Cameroon. Apartments, houses, villas, and more.",
     type: "website",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
-  themeColor: "#1E3A8A",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

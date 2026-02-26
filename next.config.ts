@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '4mb',
     },
   },
-  allowedDevOrigins: ["*"],
+  allowedDevOrigins: ["*", "*.replit.dev", "*.janeway.replit.dev"],
   images: {
     remotePatterns: [
       {
@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://uploadthing.com https://*.uploadthing.com https://api.uploadthing.com https://*.ufs.sh; frame-src https://js.stripe.com https://clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://uploadthing.com https://*.uploadthing.com https://api.uploadthing.com https://*.ufs.sh; frame-src https://js.stripe.com https://clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },
