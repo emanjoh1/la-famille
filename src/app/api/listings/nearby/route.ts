@@ -1,4 +1,4 @@
-usuimport { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const CAMEROON_CITIES: { [key: string]: { lat: number; lng: number } } = {
