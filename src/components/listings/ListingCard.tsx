@@ -72,7 +72,7 @@ function ListingCardInner({
           <Heart
             className={`w-6 h-6 drop-shadow transition-colors ${
               hearted
-                ? "text-[#FF385C] fill-[#FF385C]"
+                ? "text-[#1E3A8A] fill-[#1E3A8A]"
                 : "text-white fill-black/30"
             }`}
           />

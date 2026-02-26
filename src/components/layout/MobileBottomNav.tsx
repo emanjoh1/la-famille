@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Heart, MessageCircle, User } from "lucide-react";
+import { Home, Search, Heart, MessageCircle, HelpCircle } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
 export function MobileBottomNav() {
@@ -16,7 +16,7 @@ export function MobileBottomNav() {
     { href: "/favorites", icon: Heart, label: "Favorites" },
     { href: "/bookings", icon: Home, label: "Trips" },
     { href: "/messages", icon: MessageCircle, label: "Messages" },
-    { href: "/host/listings", icon: User, label: "Profile" },
+    { href: "/support", icon: HelpCircle, label: "Support" },
   ];
 
   return (
@@ -30,15 +30,15 @@ export function MobileBottomNav() {
               href={href}
               className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl min-w-[64px] transition-all duration-200 ${
                 isActive
-                  ? "text-[#FF385C] bg-rose-50"
+                  ? "text-[#1E3A8A] bg-rose-50"
                   : "text-gray-600 active:bg-gray-100"
               }`}
             >
               <Icon className={`w-6 h-6 transition-all duration-200 ${
-                isActive ? "fill-[#FF385C] scale-110" : ""
+                isActive ? "fill-[#1E3A8A] scale-110" : ""
               }`} />
               <span className={`text-xs font-semibold transition-colors ${
-                isActive ? "text-[#FF385C]" : "text-gray-600"
+                isActive ? "text-[#1E3A8A]" : "text-gray-600"
               }`}>{label}</span>
             </Link>
           );

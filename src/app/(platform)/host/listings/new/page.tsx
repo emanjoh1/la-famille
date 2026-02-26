@@ -151,7 +151,7 @@ export default function NewListingPage() {
                                  step > s.id
                                    ? "bg-[#222222] text-white"
                                    : step === s.id
-                                     ? "bg-[#FF385C] text-white"
+                                     ? "bg-[#1E3A8A] text-white"
                                      : "border-2 border-[#DDDDDD] text-[#717171]"
                                }`}
                 >
@@ -165,7 +165,7 @@ export default function NewListingPage() {
           </div>
           <div className="w-full bg-[#DDDDDD] rounded-full h-1">
             <div
-              className="bg-[#FF385C] h-1 rounded-full transition-all duration-300"
+              className="bg-[#1E3A8A] h-1 rounded-full transition-all duration-300"
               style={{
                 width: `${((step - 1) / (STEPS.length - 1)) * 100}%`,
               }}
@@ -347,7 +347,7 @@ export default function NewListingPage() {
                             text-center hover:border-[#222222] transition-colors cursor-pointer"
             >
               <Upload className="w-10 h-10 mx-auto mb-4 text-[#717171]" />
-              <span className="text-[#FF385C] font-semibold block">
+              <span className="text-[#1E3A8A] font-semibold block">
                 Upload photos
               </span>
               <p className="text-[#717171] text-sm mt-1">
@@ -464,8 +464,8 @@ export default function NewListingPage() {
             <button
               onClick={handleSubmit}
               disabled={submitting || uploading}
-              className="px-8 py-3 bg-[#FF385C] text-white rounded-xl font-medium
-                         hover:bg-[#E31C5F] disabled:opacity-50 disabled:cursor-not-allowed
+              className="px-8 py-3 bg-[#1E3A8A] text-white rounded-xl font-medium
+                         hover:bg-[#1E40AF] disabled:opacity-50 disabled:cursor-not-allowed
                          transition-colors"
             >
               {submitting ? "Submitting…" : "Submit for review"}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/provider";
+import { ProfileCheck } from "@/components/auth/ProfileCheck";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     maximumScale: 5,
     userScalable: true,
   },
-  themeColor: "#FF385C",
+  themeColor: "#1E3A8A",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -48,7 +49,10 @@ export default function RootLayout({
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         </head>
         <body className={`${inter.variable} antialiased touch-manipulation`}>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <ProfileCheck />
+            {children}
+          </LanguageProvider>
         </body>
       </html>
     </ClerkProvider>

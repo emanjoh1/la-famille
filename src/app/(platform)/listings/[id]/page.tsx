@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import Link from "next/link";
 import {
   Star,
   Wifi,
@@ -76,8 +77,8 @@ export default async function ListingDetailPage({
   }
 
   const [reviews, ratingData] = await Promise.all([
-    getListingReviews(id),
-    getAverageRating(id),
+    getListingReviews(id).catch(() => []),
+    getAverageRating(id).catch(() => null),
   ]);
 
   // Check if user has saved this listing
@@ -131,18 +132,20 @@ export default async function ListingDetailPage({
           </div>
 
           {/* Host info */}
-          <div className="py-6 border-b border-[#DDDDDD] flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-200 to-rose-400 flex-shrink-0 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">H</span>
-            </div>
-            <div>
-              <p className="font-medium text-[#222222]">
-                Hosted by a La Famille host
-              </p>
-              <p className="text-sm text-[#717171]">
-                Superhost · 3 years hosting
-              </p>
-            </div>
+          <div className="py-6 border-b border-[#DDDDDD]">
+            <Link href={`/host/${listing.user_id}`} className="flex items-center gap-4 hover:bg-gray-50 p-4 rounded-xl transition-colors">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">H</span>
+              </div>
+              <div>
+                <p className="font-medium text-[#222222]">
+                  Hosted by La Famille host
+                </p>
+                <p className="text-sm text-[#717171]">
+                  View host profile →
+                </p>
+              </div>
+            </Link>
           </div>
 
           {/* Description */}
@@ -220,7 +223,7 @@ export default async function ListingDetailPage({
           </span>
           <span className="text-[#717171]"> / night</span>
         </div>
-        <button className="px-6 py-3 bg-[#FF385C] text-white rounded-xl font-medium hover:bg-[#E31C5F] transition-colors">
+        <button className="px-6 py-3 bg-[#1E3A8A] text-white rounded-xl font-medium hover:bg-[#1E40AF] transition-colors">
           Reserve
         </button>
       </div>

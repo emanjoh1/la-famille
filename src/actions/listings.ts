@@ -134,6 +134,22 @@ export async function getListing(id: string) {
   return data;
 }
 
+/** Get suggested listings based on popular locations */
+export async function getSuggestedListings(limit = 12) {
+  const { data, error } = await supabaseAdmin
+    .from("listings")
+    .select("*")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error fetching suggested listings:", error);
+    return [];
+  }
+  return data || [];
+}
+
 /** Returns all listings owned by the signed-in host (all statuses) */
 export async function getUserListings() {
   const { userId } = await auth();

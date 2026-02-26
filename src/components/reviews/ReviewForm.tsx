@@ -3,39 +3,62 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { createReview } from "@/actions/reviews";
+import { useRouter } from "next/navigation";
 
-interface ReviewFormProps {
-  bookingId: string;
-  listingId: string;
-  onSuccess?: () => void;
-}
+export function ReviewForm({ bookingId, listingId }: { bookingId: string; listingId: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [ratings, setRatings] = useState({
+    overall: 0,
+    cleanliness: 0,
+    communication: 0,
+    location: 0,
+    value: 0,
+  });
+  const [comment, setComment] = useState("");
 
-function StarInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div className="flex items-center justify-between py-2">
-      <span className="text-sm text-[#222222]">{label}</span>
-      <div className="flex gap-1">
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (ratings.overall === 0) {
+      alert("Please provide an overall rating");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await createReview({
+        booking_id: bookingId,
+        listing_id: listingId,
+        overall_rating: ratings.overall,
+        cleanliness_rating: ratings.cleanliness,
+        communication_rating: ratings.communication,
+        location_rating: ratings.location,
+        value_rating: ratings.value,
+        comment,
+      });
+      router.push("/bookings");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to submit review");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const RatingInput = ({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) => (
+    <div className="mb-6">
+      <label className="block text-sm font-semibold text-gray-900 mb-2">{label}</label>
+      <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className="p-0.5"
-            aria-label={`Rate ${label} ${star} stars`}
+            className="transition-transform hover:scale-110"
           >
             <Star
-              className={`w-5 h-5 transition-colors ${
-                star <= value
-                  ? "fill-[#FF385C] text-[#FF385C]"
-                  : "text-[#DDDDDD]"
+              className={`w-8 h-8 ${
+                star <= value ? "fill-[#1E3A8A] text-[#1E3A8A]" : "text-gray-300"
               }`}
             />
           </button>
@@ -43,93 +66,60 @@ function StarInput({
       </div>
     </div>
   );
-}
-
-export function ReviewForm({ bookingId, listingId, onSuccess }: ReviewFormProps) {
-  const [ratings, setRatings] = useState({
-    overall_rating: 0,
-    cleanliness_rating: 0,
-    communication_rating: 0,
-    location_rating: 0,
-    value_rating: 0,
-  });
-  const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async () => {
-    setError(null);
-    if (Object.values(ratings).some((r) => r === 0)) {
-      setError("Please rate all categories");
-      return;
-    }
-    setLoading(true);
-    try {
-      await createReview({
-        booking_id: bookingId,
-        listing_id: listingId,
-        ...ratings,
-        comment: comment || undefined,
-      });
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit review");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-[#222222]">Leave a review</h3>
-      <div className="space-y-1">
-        <StarInput
-          label="Overall"
-          value={ratings.overall_rating}
-          onChange={(v) => setRatings((prev) => ({ ...prev, overall_rating: v }))}
-        />
-        <StarInput
-          label="Cleanliness"
-          value={ratings.cleanliness_rating}
-          onChange={(v) => setRatings((prev) => ({ ...prev, cleanliness_rating: v }))}
-        />
-        <StarInput
-          label="Communication"
-          value={ratings.communication_rating}
-          onChange={(v) => setRatings((prev) => ({ ...prev, communication_rating: v }))}
-        />
-        <StarInput
-          label="Location"
-          value={ratings.location_rating}
-          onChange={(v) => setRatings((prev) => ({ ...prev, location_rating: v }))}
-        />
-        <StarInput
-          label="Value"
-          value={ratings.value_rating}
-          onChange={(v) => setRatings((prev) => ({ ...prev, value_rating: v }))}
+    <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-8">
+      <RatingInput
+        label="Overall Rating *"
+        value={ratings.overall}
+        onChange={(v) => setRatings({ ...ratings, overall: v })}
+      />
+
+      <RatingInput
+        label="Cleanliness"
+        value={ratings.cleanliness}
+        onChange={(v) => setRatings({ ...ratings, cleanliness: v })}
+      />
+
+      <RatingInput
+        label="Communication"
+        value={ratings.communication}
+        onChange={(v) => setRatings({ ...ratings, communication: v })}
+      />
+
+      <RatingInput
+        label="Location"
+        value={ratings.location}
+        onChange={(v) => setRatings({ ...ratings, location: v })}
+      />
+
+      <RatingInput
+        label="Value"
+        value={ratings.value}
+        onChange={(v) => setRatings({ ...ratings, value: v })}
+      />
+
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          Your Review
+        </label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={6}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent resize-none"
+          placeholder="Share your experience..."
         />
       </div>
 
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Share your experience (optional)..."
-        rows={3}
-        className="w-full px-4 py-3 border border-[#DDDDDD] rounded-xl text-[#222222]
-                   placeholder-[#717171] focus:outline-none focus:border-[#222222]
-                   transition-colors text-sm resize-none"
-      />
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
       <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="px-6 py-2.5 bg-[#FF385C] text-white rounded-xl text-sm font-medium
-                   hover:bg-[#E31C5F] disabled:opacity-50 transition-colors"
+        type="submit"
+        disabled={loading || ratings.overall === 0}
+        className="w-full py-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl font-bold
+                   hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "Submitting…" : "Submit review"}
+        {loading ? "Submitting..." : "Submit Review"}
       </button>
-    </div>
+    </form>
   );
 }

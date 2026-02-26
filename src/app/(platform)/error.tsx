@@ -19,7 +19,7 @@ export default function PlatformError({
     <div className="min-h-[60vh] flex items-center justify-center px-6">
       <div className="max-w-md w-full text-center">
         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="w-8 h-8 text-[#FF385C]" />
+          <AlertTriangle className="w-8 h-8 text-[#1E3A8A]" />
         </div>
 
         <h1 className="text-2xl font-semibold text-[#222222] mb-3">
@@ -33,8 +33,8 @@ export default function PlatformError({
         <div className="flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-6 py-3 bg-[#FF385C] text-white rounded-xl font-medium
-                       hover:bg-[#E31C5F] transition-colors"
+            className="px-6 py-3 bg-[#1E3A8A] text-white rounded-xl font-medium
+                       hover:bg-[#1E40AF] transition-colors"
           >
             Try again
           </button>

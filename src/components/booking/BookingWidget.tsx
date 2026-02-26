@@ -171,8 +171,8 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       <button
         onClick={handleReserve}
         disabled={loading}
-        className="w-full py-4 bg-gradient-to-r from-[#FF385C] to-[#E31C5F] text-white
-                   font-bold text-base rounded-xl hover:from-[#E31C5F] hover:to-[#D01243]
+        className="w-full py-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white
+                   font-bold text-base rounded-xl hover:from-[#1E40AF] hover:to-[#D01243]
                    transition-all duration-200 mb-4 disabled:opacity-60 disabled:cursor-not-allowed
                    shadow-md hover:shadow-lg hover:scale-[1.02]"
       >

@@ -1,53 +1,54 @@
+"use client";
+
 import { Star } from "lucide-react";
-import { format } from "date-fns";
+import Image from "next/image";
 
 interface Review {
   id: string;
   overall_rating: number;
-  cleanliness_rating: number;
-  communication_rating: number;
-  location_rating: number;
-  value_rating: number;
-  comment?: string | null;
+  comment: string;
   created_at: string;
+  user_name: string;
+  user_avatar: string | null;
 }
 
 export function ReviewList({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) {
-    return (
-      <p className="text-[#717171] text-sm">No reviews yet. Be the first!</p>
-    );
+    return <p className="text-gray-600">No reviews yet. Be the first to review!</p>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {reviews.map((review) => (
-        <div
-          key={review.id}
-          className="border-b border-[#DDDDDD] pb-6 last:border-0"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-[#222222] text-[#222222]" />
-              <span className="text-sm font-medium text-[#222222]">
-                {review.overall_rating}
-              </span>
+        <div key={review.id} className="pb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-200 to-orange-200">
+              {review.user_avatar ? (
+                <Image src={review.user_avatar} alt={review.user_name} fill className="object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white font-bold">
+                  {review.user_name[0]}
+                </div>
+              )}
             </div>
-            <span className="text-sm text-[#717171]">
-              {format(new Date(review.created_at), "MMM yyyy")}
-            </span>
+            <div>
+              <p className="font-semibold text-gray-900">{review.user_name}</p>
+              <p className="text-sm text-gray-600">
+                {new Date(review.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </p>
+            </div>
           </div>
-          {review.comment && (
-            <p className="text-sm text-[#222222] leading-relaxed">
-              {review.comment}
-            </p>
-          )}
-          <div className="flex gap-4 mt-3 text-xs text-[#717171]">
-            <span>Cleanliness {review.cleanliness_rating}/5</span>
-            <span>Communication {review.communication_rating}/5</span>
-            <span>Location {review.location_rating}/5</span>
-            <span>Value {review.value_rating}/5</span>
+          <div className="flex items-center gap-1 mb-2">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${
+                  i < review.overall_rating ? "fill-[#1E3A8A] text-[#1E3A8A]" : "text-gray-300"
+                }`}
+              />
+            ))}
           </div>
+          <p className="text-gray-700 leading-relaxed">{review.comment}</p>
         </div>
       ))}
     </div>

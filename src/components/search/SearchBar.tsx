@@ -28,7 +28,7 @@ export function SearchBar() {
       />
       <button
         type="submit"
-        className="p-2 bg-[#FF385C] text-white rounded-full hover:bg-[#E31C5F] transition-colors flex-shrink-0 m-1"
+        className="p-2 bg-[#1E3A8A] text-white rounded-full hover:bg-[#1E40AF] transition-colors flex-shrink-0 m-1"
         aria-label="Search"
       >
         <Search className="w-4 h-4" />

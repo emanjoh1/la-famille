@@ -31,8 +31,8 @@ export default async function HostListingsPage() {
         <h1 className="text-3xl font-semibold text-[#222222]">Your listings</h1>
         <Link
           href="/host/listings/new"
-          className="flex items-center gap-2 px-5 py-3 bg-[#FF385C] text-white
-                     rounded-xl font-medium hover:bg-[#E31C5F] transition-colors"
+          className="flex items-center gap-2 px-5 py-3 bg-[#1E3A8A] text-white
+                     rounded-xl font-medium hover:bg-[#1E40AF] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add listing
@@ -49,8 +49,8 @@ export default async function HostListingsPage() {
           </p>
           <Link
             href="/host/listings/new"
-            className="inline-block px-6 py-3 bg-[#FF385C] text-white rounded-xl
-                       font-medium hover:bg-[#E31C5F] transition-colors"
+            className="inline-block px-6 py-3 bg-[#1E3A8A] text-white rounded-xl
+                       font-medium hover:bg-[#1E40AF] transition-colors"
           >
             Get started
           </Link>

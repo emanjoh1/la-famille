@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import {
   getConversation,
   getMessages,
@@ -17,11 +18,9 @@ interface ConversationWithListing extends Conversation {
   listings?: { id: string; title: string; location: string; images?: string[] } | null;
 }
 
-export default function ConversationPage({
-  params,
-}: {
-  params: { conversationId: string };
-}) {
+export default function ConversationPage() {
+  const params = useParams();
+  const conversationId = params.conversationId as string;
   const { userId } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversation, setConversation] = useState<ConversationWithListing | null>(null);
@@ -30,31 +29,46 @@ export default function ConversationPage({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadData();
-  }, [params.conversationId]);
+    if (conversationId) {
+      loadData();
+    }
+  }, [conversationId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const loadData = async () => {
-    const [conv, msgs, allConvs] = await Promise.all([
-      getConversation(params.conversationId),
-      getMessages(params.conversationId),
-      getUserConversations(),
-    ]);
-    setConversation(conv);
-    setMessages(msgs);
-    setConversations(allConvs.map(c => ({
-      ...c,
-      listings: Array.isArray(c.listings) ? c.listings[0] : c.listings
-    })));
+    if (!conversationId) return;
+    try {
+      const [conv, msgs, allConvs] = await Promise.all([
+        getConversation(conversationId),
+        getMessages(conversationId),
+        getUserConversations(),
+      ]);
+      setConversation(conv);
+      setMessages(msgs);
+      setConversations(allConvs.map(c => {
+        const listing = Array.isArray(c.listings) ? c.listings[0] : c.listings;
+        return {
+          id: c.id,
+          listing_id: c.listing_id,
+          host_id: c.host_id,
+          guest_id: c.guest_id,
+          created_at: c.created_at,
+          listings: listing
+        };
+      }));
+    } catch (error) {
+      console.error("Failed to load conversation:", error);
+      setTimeout(() => loadData(), 1000);
+    }
   };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim()) return;
-    await sendMessage(params.conversationId, content);
+    if (!content.trim() || !conversationId) return;
+    await sendMessage(conversationId, content);
     setContent("");
     loadData();
   };
@@ -83,15 +97,15 @@ export default function ConversationPage({
               href={`/messages/${conv.id}`}
               className={`flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD]
                           hover:bg-[#F7F7F7] transition-colors
-                          ${conv.id === params.conversationId ? "bg-[#F7F7F7]" : ""}`}
+                          ${conv.id === conversationId ? "bg-[#F7F7F7]" : ""}`}
             >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-200 to-rose-400 flex-shrink-0 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
                 <span className="text-white font-semibold text-sm">H</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p
                   className={`truncate text-sm ${
-                    conv.id === params.conversationId
+                    conv.id === conversationId
                       ? "font-semibold text-[#222222]"
                       : "font-medium text-[#222222]"
                   }`}
@@ -137,7 +151,7 @@ export default function ConversationPage({
                     <div
                       className={`px-4 py-2.5 rounded-2xl text-sm ${
                         isOwn
-                          ? "bg-[#FF385C] text-white rounded-br-sm"
+                          ? "bg-[#1E3A8A] text-white rounded-br-sm"
                           : "bg-[#F7F7F7] text-[#222222] rounded-bl-sm"
                       }`}
                     >
@@ -174,7 +188,7 @@ export default function ConversationPage({
             <button
               type="submit"
               disabled={!content.trim()}
-              className="p-3 bg-[#FF385C] text-white rounded-full hover:bg-[#E31C5F]
+              className="p-3 bg-[#1E3A8A] text-white rounded-full hover:bg-[#1E40AF]
                          disabled:bg-[#DDDDDD] transition-colors flex-shrink-0"
               aria-label="Send"
             >

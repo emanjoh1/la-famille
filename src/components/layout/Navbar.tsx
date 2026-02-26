@@ -28,10 +28,10 @@ export function Navbar() {
 
           {/* Left: Logo */}
           <Link href="/explore" className="flex-shrink-0 flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#FF385C] to-[#E31C5F] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#1E3A8A] to-[#1E40AF] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <span className="text-xl">🏠</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#FF385C] to-[#E31C5F] bg-clip-text text-transparent">La Famille</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] bg-clip-text text-transparent">La Famille</span>
           </Link>
 
           {/* Center: Search pill */}
@@ -61,8 +61,8 @@ export function Navbar() {
             />
             <button
               onClick={handleSearch}
-              className="px-5 py-3 bg-gradient-to-r from-[#FF385C] to-[#E31C5F] text-white rounded-r-full
-                         hover:from-[#E31C5F] hover:to-[#D01243] transition-all duration-200 hover:shadow-md"
+              className="px-5 py-3 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-r-full
+                         hover:from-[#1E40AF] hover:to-[#D01243] transition-all duration-200 hover:shadow-md"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -75,7 +75,7 @@ export function Navbar() {
               // Show Sign Up button for guests
               <Link
                 href="/auth"
-                className="px-6 py-3 bg-gradient-to-r from-[#FF385C] to-[#E31C5F] text-white rounded-full text-sm font-semibold
+                className="px-6 py-3 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-full text-sm font-semibold
                            hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md"
               >
                 Sign Up
@@ -146,11 +146,40 @@ export function Navbar() {
                           Messages
                         </Link>
                         <div className="border-t border-gray-200 my-2" />
+                        <Link
+                          href="/support"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          Support
+                        </Link>
+                        <Link
+                          href="/about"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          About Us
+                        </Link>
+                        <Link
+                          href="/careers"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          Careers
+                        </Link>
+                        <Link
+                          href="/faq"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          FAQ
+                        </Link>
+                        <div className="border-t border-gray-200 my-2" />
                         {isAdmin && (
                           <Link
                             href="/admin"
                             onClick={() => setMenuOpen(false)}
-                            className="block px-5 py-3 text-sm font-semibold text-[#FF385C] hover:bg-rose-50 transition-colors"
+                            className="block px-5 py-3 text-sm font-semibold text-[#1E3A8A] hover:bg-rose-50 transition-colors"
                           >
                             Admin Panel
                           </Link>

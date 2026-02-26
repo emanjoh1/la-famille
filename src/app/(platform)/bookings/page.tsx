@@ -1,7 +1,9 @@
 import { getUserBookings } from "@/actions/bookings";
+import { canReviewBooking } from "@/actions/reviews";
 import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
+import { BookingActions } from "@/components/booking/BookingActions";
 
 export const metadata = {
   title: "Trips | La Famille",
@@ -18,12 +20,19 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default async function BookingsPage() {
   const bookings = await getUserBookings();
+  
+  const bookingsWithReviewStatus = await Promise.all(
+    bookings.map(async (booking) => ({
+      ...booking,
+      canReview: await canReviewBooking(booking.id),
+    }))
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <h1 className="text-3xl font-semibold text-[#222222] mb-8">Trips</h1>
 
-      {bookings.length === 0 ? (
+      {bookingsWithReviewStatus.length === 0 ? (
         <div className="border border-[#DDDDDD] rounded-2xl p-12 text-center">
           <p className="text-2xl font-semibold text-[#222222] mb-3">
             No trips booked... yet!
@@ -41,56 +50,70 @@ export default async function BookingsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {bookings.map((booking) => (
-            <Link
+          {bookingsWithReviewStatus.map((booking) => (
+            <div
               key={booking.id}
-              href={`/listings/${booking.listing_id}`}
-              className="flex gap-6 p-4 border border-[#DDDDDD] rounded-2xl
-                         hover:shadow-md transition-shadow group"
+              className="flex gap-6 p-4 border border-[#DDDDDD] rounded-2xl hover:shadow-md transition-shadow"
             >
-              <div className="relative w-40 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                {booking.listings?.images?.[0] ? (
-                  <Image
-                    src={booking.listings.images[0]}
-                    alt={booking.listings.title ?? "Listing"}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="160px"
-                  />
-                ) : (
-                  <span className="text-3xl">🏠</span>
+              <Link href={`/listings/${booking.listing_id}`} className="flex gap-6 flex-1 min-w-0">
+                <div className="relative w-40 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                  {booking.listings?.images?.[0] ? (
+                    <Image
+                      src={booking.listings.images[0]}
+                      alt={booking.listings.title ?? "Listing"}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      sizes="160px"
+                    />
+                  ) : (
+                    <span className="text-3xl">🏠</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-1 gap-4">
+                    <h3 className="font-semibold text-[#222222] text-lg truncate">
+                      {booking.listings?.title ?? "Listing"}
+                    </h3>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                        STATUS_STYLES[booking.status ?? "pending"] ?? STATUS_STYLES.pending
+                      }`}
+                    >
+                      {booking.status
+                        ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
+                        : "Pending"}
+                    </span>
+                  </div>
+                  <p className="text-[#717171] text-sm mb-3">{booking.listings?.location ?? ""}</p>
+                  <p className="text-sm text-[#222222]">
+                    {booking.check_in
+                      ? format(new Date(booking.check_in), "MMM d")
+                      : "—"}{" "}
+                    –{" "}
+                    {booking.check_out
+                      ? format(new Date(booking.check_out), "MMM d, yyyy")
+                      : "—"}
+                  </p>
+                  <p className="text-sm font-semibold text-[#222222] mt-1">
+                    {Number(booking.total_price ?? 0).toLocaleString()} XAF
+                  </p>
+                </div>
+              </Link>
+              <div className="flex flex-col gap-2">
+                {booking.status === "pending" && (
+                  <BookingActions bookingId={booking.id} />
+                )}
+                {booking.canReview && (
+                  <Link
+                    href={`/bookings/${booking.id}/review`}
+                    className="px-4 py-2 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl text-sm font-semibold
+                               hover:shadow-lg transition-all text-center"
+                  >
+                    Write Review
+                  </Link>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-1 gap-4">
-                  <h3 className="font-semibold text-[#222222] text-lg truncate">
-                    {booking.listings?.title ?? "Listing"}
-                  </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                      STATUS_STYLES[booking.status ?? "pending"] ?? STATUS_STYLES.pending
-                    }`}
-                  >
-                    {booking.status
-                      ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1)
-                      : "Pending"}
-                  </span>
-                </div>
-                <p className="text-[#717171] text-sm mb-3">{booking.listings?.location ?? ""}</p>
-                <p className="text-sm text-[#222222]">
-                  {booking.check_in
-                    ? format(new Date(booking.check_in), "MMM d")
-                    : "—"}{" "}
-                  –{" "}
-                  {booking.check_out
-                    ? format(new Date(booking.check_out), "MMM d, yyyy")
-                    : "—"}
-                </p>
-                <p className="text-sm font-semibold text-[#222222] mt-1">
-                  {Number(booking.total_price ?? 0).toLocaleString()} XAF
-                </p>
-              </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

@@ -34,7 +34,7 @@ export default async function MessagesPage() {
                   className="flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD]
                              hover:bg-[#F7F7F7] transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-200 to-rose-400 flex-shrink-0 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">H</span>
                   </div>
                   <div className="flex-1 min-w-0">

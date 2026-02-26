@@ -8,12 +8,14 @@ async function verifyConversationAccess(
   conversationId: string,
   userId: string
 ) {
+  console.log("Verifying conversation:", conversationId, "for user:", userId);
   const { data, error } = await supabaseAdmin
     .from("conversations")
     .select("id, host_id, guest_id")
     .eq("id", conversationId)
     .single();
 
+  console.log("Conversation query result:", { data, error });
   if (error || !data) throw new Error("Conversation not found");
   if (data.host_id !== userId && data.guest_id !== userId) {
     throw new Error("Forbidden: not a participant");
@@ -104,4 +106,32 @@ export async function getUserConversations() {
     return [];
   }
   return data || [];
+}
+
+export async function getOrCreateConversation(listingId: string, hostId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const { data: existing } = await supabaseAdmin
+    .from("conversations")
+    .select("id")
+    .eq("listing_id", listingId)
+    .eq("guest_id", userId)
+    .eq("host_id", hostId)
+    .single();
+
+  if (existing) return existing.id;
+
+  const { data: newConv, error } = await supabaseAdmin
+    .from("conversations")
+    .insert({
+      listing_id: listingId,
+      host_id: hostId,
+      guest_id: userId,
+    })
+    .select("id")
+    .single();
+
+  if (error) throw new Error("Failed to create conversation");
+  return newConv.id;
 }
