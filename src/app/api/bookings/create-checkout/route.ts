@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-01-28.clover",
+  apiVersion: "2025-02-24.acacia",
 });
 
 export async function POST(req: NextRequest) {
@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { bookingId, listingTitle, totalPrice } = await req.json();
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.REPLIT_DEV_DOMAIN}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -30,8 +32,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bookings?cancelled=true`,
+      success_url: `${baseUrl}/bookings?success=true`,
+      cancel_url: `${baseUrl}/bookings?cancelled=true`,
       metadata: {
         booking_id: bookingId,
         userId,
