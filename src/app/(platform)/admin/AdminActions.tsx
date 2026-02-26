@@ -16,10 +16,14 @@ export default function AdminActions({ listingId }: { listingId: string }) {
     setLoading("approve");
     setError(null);
     try {
-      await approveListing(listingId);
+      const result = await approveListing(listingId);
+      if (result && "error" in result) {
+        setError(result.error);
+        return;
+      }
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to approve.");
+      setError("Failed to approve. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -29,11 +33,15 @@ export default function AdminActions({ listingId }: { listingId: string }) {
     setLoading("reject");
     setError(null);
     try {
-      await rejectListing(listingId, reason.trim() || undefined);
+      const result = await rejectListing(listingId, reason.trim() || undefined);
+      if (result && "error" in result) {
+        setError(result.error);
+        return;
+      }
       setShowRejectModal(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reject.");
+      setError("Failed to reject. Please try again.");
     } finally {
       setLoading(null);
     }

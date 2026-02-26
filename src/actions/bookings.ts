@@ -12,7 +12,7 @@ export async function createBooking(data: {
   check_in: string;
   check_out: string;
   guests: number;
-}) {
+}): Promise<{ error: string } | { data: any }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -25,23 +25,23 @@ export async function createBooking(data: {
     .single();
 
   if (listingError || !listing) {
-    throw new Error("Listing not found or not available");
+    return { error: "Listing not found or not available" };
   }
 
   // Prevent hosts from booking their own properties
   if (listing.user_id === userId) {
-    throw new Error("You cannot book your own property");
+    return { error: "You cannot book your own property" };
   }
 
   if (data.guests > listing.max_guests) {
-    throw new Error(`Maximum ${listing.max_guests} guests allowed`);
+    return { error: `Maximum ${listing.max_guests} guests allowed` };
   }
 
   const checkIn = new Date(data.check_in);
   const checkOut = new Date(data.check_out);
 
   if (checkOut <= checkIn) {
-    throw new Error("Check-out must be after check-in");
+    return { error: "Check-out must be after check-in" };
   }
 
   const nights = Math.ceil(
@@ -61,7 +61,7 @@ export async function createBooking(data: {
     .lte("check_in", data.check_out);
 
   if (conflicts && conflicts.length > 0) {
-    throw new Error("These dates are no longer available");
+    return { error: "These dates are no longer available" };
   }
 
   const booking = {
@@ -81,7 +81,7 @@ export async function createBooking(data: {
     .select("*, listings(*)")
     .single();
 
-  if (error) throw new Error(error.message || "Failed to create booking");
+  if (error) return { error: error.message || "Failed to create booking" };
 
   // Create conversation between guest and host
   try {
@@ -313,7 +313,7 @@ export async function createBooking(data: {
   }
 
   revalidatePath("/bookings");
-  return result;
+  return { data: result };
 }
 
 export async function getUserBookings() {
@@ -341,7 +341,7 @@ export async function getUserBookings() {
 export async function updateBookingStatus(
   bookingId: string,
   status: "confirmed" | "cancelled"
-) {
+): Promise<{ error: string } | { data: any }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -351,7 +351,7 @@ export async function updateBookingStatus(
     .eq("id", bookingId)
     .single();
 
-  if (fetchError || !booking) throw new Error("Booking not found");
+  if (fetchError || !booking) return { error: "Booking not found" };
 
   const isGuest = booking.user_id === userId;
   const listingData = booking.listings as unknown as { user_id: string } | null;
@@ -360,11 +360,11 @@ export async function updateBookingStatus(
   if (status === "cancelled") {
     if (!isGuest && !isHost) throw new Error("Forbidden");
     if (booking.status === "confirmed" && isGuest) {
-      throw new Error("Cannot cancel confirmed bookings. Please contact support.");
+      return { error: "Cannot cancel confirmed bookings. Please contact support." };
     }
   }
   if (status === "confirmed" && !isHost) {
-    throw new Error("Only the host can confirm bookings");
+    return { error: "Only the host can confirm bookings" };
   }
 
   const { data, error } = await supabaseAdmin
@@ -374,8 +374,8 @@ export async function updateBookingStatus(
     .select()
     .single();
 
-  if (error) throw new Error(error.message || "Failed to update booking");
+  if (error) return { error: error.message || "Failed to update booking" };
 
   revalidatePath("/bookings");
-  return data;
+  return { data };
 }

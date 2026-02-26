@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Clock,
   Sparkles,
+  X,
 } from "lucide-react";
 
 const STEPS = [
@@ -77,6 +78,10 @@ export default function NewListingPage() {
     }
   };
 
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     setError(null);
     setSubmitting(true);
@@ -85,13 +90,15 @@ export default function NewListingPage() {
       Object.entries(formValues).forEach(([k, v]) => formData.append(k, v));
       formData.append("images", JSON.stringify(images));
       formData.append("amenities", JSON.stringify(selectedAmenities));
-      await createListing(formData);
+      const result = await createListing(formData);
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
       setSubmitted(true);
     } catch (err) {
       console.error("Submit error:", err);
-      const msg =
-        err instanceof Error ? err.message : "Something went wrong.";
-      setError(msg);
+      setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -377,7 +384,7 @@ export default function NewListingPage() {
                   {images.map((url, i) => (
                     <div
                       key={i}
-                      className="relative aspect-square rounded-lg overflow-hidden"
+                      className="relative aspect-square rounded-lg overflow-hidden group"
                     >
                       <Image
                         src={url}
@@ -386,6 +393,15 @@ export default function NewListingPage() {
                         className="object-cover"
                         sizes="(max-width: 640px) 33vw, 200px"
                       />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center
+                                   justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity
+                                   hover:bg-red-50 shadow-sm"
+                      >
+                        <X className="w-4 h-4 text-red-600" />
+                      </button>
                     </div>
                   ))}
                 </div>

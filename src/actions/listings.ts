@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 // ─── Host actions ──────────────────────────────────────────────
 
-export async function createListing(formData: FormData) {
+export async function createListing(formData: FormData): Promise<{ error: string } | { data: any }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -17,11 +17,11 @@ export async function createListing(formData: FormData) {
     amenities = JSON.parse((formData.get("amenities") as string) ?? "[]");
     images = JSON.parse((formData.get("images") as string) ?? "[]");
   } catch {
-    throw new Error("Invalid amenities or images data");
+    return { error: "Invalid amenities or images data" };
   }
 
   if (!Array.isArray(amenities) || !Array.isArray(images)) {
-    throw new Error("Amenities and images must be arrays");
+    return { error: "Amenities and images must be arrays" };
   }
 
   const title = (formData.get("title") as string) ?? "";
@@ -32,16 +32,12 @@ export async function createListing(formData: FormData) {
   const maxGuests = Number(formData.get("max_guests"));
 
   // Basic validation
-  if (title.length < 5) throw new Error("Title must be at least 5 characters");
-  if (title.length > 120)
-    throw new Error("Title must be at most 120 characters");
-  if (description.length < 20)
-    throw new Error("Description must be at least 20 characters");
-  if (isNaN(price) || price < 1000)
-    throw new Error("Minimum price is 1,000 FCFA");
-  if (isNaN(maxGuests) || maxGuests < 1)
-    throw new Error("Must accommodate at least 1 guest");
-  if (images.length === 0) throw new Error("At least one image is required");
+  if (title.length < 5) return { error: "Title must be at least 5 characters" };
+  if (title.length > 120) return { error: "Title must be at most 120 characters" };
+  if (description.length < 20) return { error: "Description must be at least 20 characters" };
+  if (isNaN(price) || price < 1000) return { error: "Minimum price is 1,000 FCFA" };
+  if (isNaN(maxGuests) || maxGuests < 1) return { error: "Must accommodate at least 1 guest" };
+  if (images.length === 0) return { error: "At least one image is required" };
 
   const listing = {
     user_id: userId,
@@ -66,7 +62,7 @@ export async function createListing(formData: FormData) {
 
   if (error) {
     console.error("Supabase error:", error);
-    throw new Error(error.message || "Failed to create listing");
+    return { error: error.message || "Failed to create listing" };
   }
 
   // Send notification email to admin (fire-and-forget)
@@ -81,7 +77,7 @@ export async function createListing(formData: FormData) {
   }
 
   revalidatePath("/host/listings");
-  return data;
+  return { data };
 }
 
 // ─── Public listing queries ────────────────────────────────────
@@ -218,7 +214,7 @@ export async function getAllListingsAdmin() {
 }
 
 /** Admin approves a listing — it becomes visible on /explore */
-export async function approveListing(listingId: string) {
+export async function approveListing(listingId: string): Promise<{ error: string } | void> {
   await assertAdmin();
 
   const { error } = await supabaseAdmin
@@ -226,7 +222,7 @@ export async function approveListing(listingId: string) {
     .update({ status: "approved", rejection_reason: null })
     .eq("id", listingId);
 
-  if (error) throw new Error(error.message || "Failed to approve listing");
+  if (error) return { error: error.message || "Failed to approve listing" };
 
   revalidatePath("/admin");
   revalidatePath("/explore");
@@ -234,7 +230,7 @@ export async function approveListing(listingId: string) {
 }
 
 /** Admin rejects a listing with an optional reason sent back to the host */
-export async function rejectListing(listingId: string, reason?: string) {
+export async function rejectListing(listingId: string, reason?: string): Promise<{ error: string } | void> {
   await assertAdmin();
 
   const { error } = await supabaseAdmin
@@ -245,7 +241,7 @@ export async function rejectListing(listingId: string, reason?: string) {
     })
     .eq("id", listingId);
 
-  if (error) throw new Error(error.message || "Failed to reject listing");
+  if (error) return { error: error.message || "Failed to reject listing" };
 
   revalidatePath("/admin");
   revalidatePath("/host/listings");
@@ -254,7 +250,7 @@ export async function rejectListing(listingId: string, reason?: string) {
 // ─── Host management actions ───────────────────────────────────
 
 /** Update an existing listing (host only) */
-export async function updateListing(listingId: string, formData: FormData) {
+export async function updateListing(listingId: string, formData: FormData): Promise<{ error: string } | void> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -285,11 +281,11 @@ export async function updateListing(listingId: string, formData: FormData) {
     amenities = JSON.parse((formData.get("amenities") as string) ?? "[]");
     images = JSON.parse((formData.get("images") as string) ?? "[]");
   } catch {
-    throw new Error("Invalid amenities or images data");
+    return { error: "Invalid amenities or images data" };
   }
 
   if (!Array.isArray(amenities) || !Array.isArray(images)) {
-    throw new Error("Amenities and images must be arrays");
+    return { error: "Amenities and images must be arrays" };
   }
 
   const title = (formData.get("title") as string) ?? "";
@@ -300,12 +296,12 @@ export async function updateListing(listingId: string, formData: FormData) {
   const maxGuests = Number(formData.get("max_guests"));
 
   // Validation
-  if (title.length < 5) throw new Error("Title must be at least 5 characters");
-  if (title.length > 120) throw new Error("Title must be at most 120 characters");
-  if (description.length < 20) throw new Error("Description must be at least 20 characters");
-  if (isNaN(price) || price < 1000) throw new Error("Minimum price is 1,000 FCFA");
-  if (isNaN(maxGuests) || maxGuests < 1) throw new Error("Must accommodate at least 1 guest");
-  if (images.length === 0) throw new Error("At least one image is required");
+  if (title.length < 5) return { error: "Title must be at least 5 characters" };
+  if (title.length > 120) return { error: "Title must be at most 120 characters" };
+  if (description.length < 20) return { error: "Description must be at least 20 characters" };
+  if (isNaN(price) || price < 1000) return { error: "Minimum price is 1,000 FCFA" };
+  if (isNaN(maxGuests) || maxGuests < 1) return { error: "Must accommodate at least 1 guest" };
+  if (images.length === 0) return { error: "At least one image is required" };
 
   const updates = {
     title,
@@ -328,7 +324,7 @@ export async function updateListing(listingId: string, formData: FormData) {
 
   if (error) {
     console.error("Supabase error:", error);
-    throw new Error(error.message || "Failed to update listing");
+    return { error: error.message || "Failed to update listing" };
   }
 
   revalidatePath("/host/listings");

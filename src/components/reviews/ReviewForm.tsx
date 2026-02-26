@@ -19,7 +19,7 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (ratings.overall === 0) {
       alert("Please provide an overall rating");
       return;
@@ -27,7 +27,7 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
 
     setLoading(true);
     try {
-      await createReview({
+      const result = await createReview({
         booking_id: bookingId,
         listing_id: listingId,
         overall_rating: ratings.overall,
@@ -37,9 +37,14 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
         value_rating: ratings.value,
         comment,
       });
+      if ("error" in result) {
+        alert(result.error);
+        setLoading(false);
+        return;
+      }
       router.push("/bookings");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to submit review");
+      alert("Failed to submit review. Please try again.");
     } finally {
       setLoading(false);
     }

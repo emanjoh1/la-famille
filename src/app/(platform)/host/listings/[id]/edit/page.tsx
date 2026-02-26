@@ -112,13 +112,16 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
       Object.entries(formValues).forEach(([k, v]) => formData.append(k, v));
       formData.append("images", JSON.stringify(images));
       formData.append("amenities", JSON.stringify(selectedAmenities));
-      await updateListing(listingId, formData);
+      const result = await updateListing(listingId, formData);
+      if (result && "error" in result) {
+        setError(result.error);
+        return;
+      }
       router.push("/host/listings");
       router.refresh();
     } catch (err) {
       console.error("Update error:", err);
-      const msg = err instanceof Error ? err.message : "Something went wrong.";
-      setError(msg);
+      setError("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -369,8 +372,8 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                     <button
                       onClick={() => removeImage(i)}
                       className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center
-                                 justify-center opacity-0 group-hover:opacity-100 transition-opacity
-                                 hover:bg-red-50"
+                                 justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity
+                                 hover:bg-red-50 shadow-sm"
                     >
                       <X className="w-4 h-4 text-red-600" />
                     </button>

@@ -13,7 +13,7 @@ export async function createReview(data: {
   location_rating: number;
   value_rating: number;
   comment: string;
-}) {
+}): Promise<{ error: string } | { data: any }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -24,11 +24,11 @@ export async function createReview(data: {
     .eq("user_id", userId)
     .single();
 
-  if (!booking) throw new Error("Booking not found");
-  if (booking.status !== "confirmed") throw new Error("Can only review confirmed bookings");
-  
+  if (!booking) return { error: "Booking not found" };
+  if (booking.status !== "confirmed") return { error: "Can only review confirmed bookings" };
+
   const checkOutDate = new Date(booking.check_out);
-  if (checkOutDate > new Date()) throw new Error("Can only review after check-out");
+  if (checkOutDate > new Date()) return { error: "Can only review after check-out" };
 
   const { data: existing } = await supabaseAdmin
     .from("reviews")
@@ -36,7 +36,7 @@ export async function createReview(data: {
     .eq("booking_id", data.booking_id)
     .single();
 
-  if (existing) throw new Error("Review already submitted");
+  if (existing) return { error: "Review already submitted" };
 
   const { data: review, error } = await supabaseAdmin
     .from("reviews")
@@ -47,11 +47,11 @@ export async function createReview(data: {
     .select()
     .single();
 
-  if (error) throw new Error(error.message || "Failed to create review");
+  if (error) return { error: error.message || "Failed to create review" };
 
   revalidatePath(`/listings/${data.listing_id}`);
   revalidatePath("/bookings");
-  return review;
+  return { data: review };
 }
 
 export async function getListingReviews(listingId: string) {

@@ -23,15 +23,15 @@ async function verifyConversationAccess(
   return data;
 }
 
-export async function sendMessage(conversationId: string, content: string) {
+export async function sendMessage(conversationId: string, content: string): Promise<{ error: string } | { data: any }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   if (!content || content.trim().length === 0) {
-    throw new Error("Message cannot be empty");
+    return { error: "Message cannot be empty" };
   }
   if (content.length > 5000) {
-    throw new Error("Message must be at most 5000 characters");
+    return { error: "Message must be at most 5000 characters" };
   }
 
   // Verify user is part of this conversation
@@ -47,10 +47,10 @@ export async function sendMessage(conversationId: string, content: string) {
     .select()
     .single();
 
-  if (error) throw new Error(error.message || "Failed to send message");
+  if (error) return { error: error.message || "Failed to send message" };
 
   revalidatePath(`/messages/${conversationId}`);
-  return data;
+  return { data };
 }
 
 export async function getConversation(conversationId: string) {

@@ -11,13 +11,18 @@ export function BookingActions({ bookingId }: { bookingId: string }) {
 
   const handleCancel = async () => {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
-    
+
     setLoading(true);
     try {
-      await updateBookingStatus(bookingId, "cancelled");
+      const result = await updateBookingStatus(bookingId, "cancelled");
+      if ("error" in result) {
+        alert(result.error);
+        setLoading(false);
+        return;
+      }
       router.refresh();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Failed to cancel booking");
+      alert("Failed to cancel booking. Please try again.");
     } finally {
       setLoading(false);
     }

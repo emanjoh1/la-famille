@@ -47,19 +47,25 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
     setLoading(true);
     try {
       // Create booking
-      const booking = await createBooking({
+      const result = await createBooking({
         listing_id: listing.id,
         check_in: checkIn,
         check_out: checkOut,
         guests,
       });
 
+      if ("error" in result) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      }
+
       // Create Stripe checkout session
       const response = await fetch("/api/bookings/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          bookingId: booking.id,
+          bookingId: result.data.id,
           listingTitle: `Booking for ${nights} night${nights !== 1 ? "s" : ""}`,
           totalPrice: total,
         }),
@@ -73,13 +79,13 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
-      
+
       // If unauthorized, redirect to login
       if (msg === "Unauthorized") {
         router.push("/auth?redirect=" + encodeURIComponent(window.location.pathname));
         return;
       }
-      
+
       setError(msg);
       setLoading(false);
     }

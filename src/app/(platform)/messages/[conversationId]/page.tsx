@@ -68,7 +68,11 @@ export default function ConversationPage() {
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim() || !conversationId) return;
-    await sendMessage(conversationId, content);
+    const result = await sendMessage(conversationId, content);
+    if ("error" in result) {
+      console.error("Send message error:", result.error);
+      return;
+    }
     setContent("");
     loadData();
   };
