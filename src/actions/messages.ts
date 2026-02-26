@@ -94,7 +94,7 @@ export async function getUserConversations() {
   const { data, error } = await supabaseAdmin
     .from("conversations")
     .select(
-      "id, host_id, guest_id, created_at, listings(id, title, location, images)"
+      "id, listing_id, host_id, guest_id, created_at, listings(id, title, location, images)"
     )
     .or(`host_id.eq.${userId},guest_id.eq.${userId}`)
     .order("created_at", { ascending: false });

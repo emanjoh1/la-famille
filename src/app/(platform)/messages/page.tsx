@@ -39,10 +39,10 @@ export default async function MessagesPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-[#222222] truncate">
-                      {conv.listings?.title}
+                      {(Array.isArray(conv.listings) ? conv.listings[0] : conv.listings)?.title}
                     </p>
                     <p className="text-sm text-[#717171] truncate">
-                      {conv.listings?.location}
+                      {(Array.isArray(conv.listings) ? conv.listings[0] : conv.listings)?.location}
                     </p>
                   </div>
                 </Link>
