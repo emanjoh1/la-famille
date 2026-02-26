@@ -9,7 +9,7 @@ export function MobileBookingButton({ listing }: { listing: any }) {
 
   return (
     <>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD] px-6 py-4 flex items-center justify-between z-50 safe-area-bottom">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD] px-6 py-4 flex items-center justify-between z-[70] safe-area-bottom">
         <div>
           <span className="font-semibold text-[#222222]">
             {listing.price_per_night.toLocaleString()} XAF
