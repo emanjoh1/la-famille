@@ -124,6 +124,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 if (checkOut && e.target.value >= checkOut) setCheckOut("");
               }}
               className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
+              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
               required
             />
           </div>
@@ -140,6 +141,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setError(null);
               }}
               className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
+              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
               required
               disabled={!checkIn}
             />

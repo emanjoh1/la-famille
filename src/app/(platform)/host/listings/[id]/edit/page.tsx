@@ -393,6 +393,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
             <input
               type="file"
               accept="image/*"
+              capture="environment"
               multiple
               onChange={handleImageUpload}
               className="hidden"

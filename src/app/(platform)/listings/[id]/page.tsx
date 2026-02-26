@@ -26,6 +26,7 @@ import { ImageGallery } from "@/components/listings/ImageGallery";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { SaveButton } from "@/components/listings/SaveButton";
 import { ShareButton } from "@/components/listings/ShareButton";
+import { MobileBookingButton } from "./ListingClient";
 import type { LucideIcon } from "lucide-react";
 
 const AMENITY_ICONS: Record<string, LucideIcon> = {
@@ -213,20 +214,7 @@ export default async function ListingDetailPage({
       </div>
 
       {/* Mobile sticky bottom bar */}
-      <div
-        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#DDDDDD]
-                      px-6 py-4 flex items-center justify-between z-50"
-      >
-        <div>
-          <span className="font-semibold text-[#222222]">
-            {listing.price_per_night.toLocaleString()} XAF
-          </span>
-          <span className="text-[#717171]"> / night</span>
-        </div>
-        <button className="px-6 py-3 bg-[#1E3A8A] text-white rounded-xl font-medium hover:bg-[#1E40AF] transition-colors">
-          Reserve
-        </button>
-      </div>
+      <MobileBookingButton listing={listing} />
     </div>
   );
 }
