@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Search, Home, Shield, Heart, Star, MapPin, Users, Sparkles } from "lucide-react";
+import { Home, Shield, Heart, Star, MapPin, Users, Sparkles } from "lucide-react";
 import { POPULAR_CITIES } from "@/lib/utils/constants";
+import { SearchBar } from "@/components/home/SearchBar";
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -10,6 +11,8 @@ export default async function HomePage() {
   if (userId) {
     redirect("/explore");
   }
+
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <div className="min-h-screen bg-white">
@@ -59,49 +62,7 @@ export default async function HomePage() {
             </div>
 
             {/* Enhanced Search Bar */}
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-2">
-                <div className="flex flex-col md:flex-row gap-2">
-                  <div className="flex-1 px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5 text-[#1E3A8A]" />
-                      <div className="flex-1">
-                        <p className="text-xs font-bold text-gray-900 mb-1">Where</p>
-                        <input
-                          type="text"
-                          placeholder="Search destinations"
-                          className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent focus:outline-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
-                    <p className="text-xs font-bold text-gray-900 mb-1">Check in</p>
-                    <p className="text-sm text-gray-500">Add dates</p>
-                  </div>
-
-                  <div className="px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
-                    <p className="text-xs font-bold text-gray-900 mb-1">Check out</p>
-                    <p className="text-sm text-gray-500">Add dates</p>
-                  </div>
-
-                  <div className="flex items-center gap-3 px-5 py-3">
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-gray-900 mb-1">Guests</p>
-                      <p className="text-sm text-gray-500">Add guests</p>
-                    </div>
-                    <Link
-                      href="/explore"
-                      className="p-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl
-                                 hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md"
-                    >
-                      <Search className="w-5 h-5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SearchBar today={today} />
           </div>
         </div>
 

@@ -16,6 +16,20 @@ export async function createBooking(data: {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
+  // Validate dates are not in the past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkInDate = new Date(data.check_in);
+  const checkOutDate = new Date(data.check_out);
+
+  if (checkInDate < today) {
+    return { error: "Check-in date cannot be in the past" };
+  }
+
+  if (checkOutDate <= checkInDate) {
+    return { error: "Check-out must be after check-in" };
+  }
+
   // Fetch listing to validate and get real price
   const { data: listing, error: listingError } = await supabaseAdmin
     .from("listings")
@@ -39,10 +53,6 @@ export async function createBooking(data: {
 
   const checkIn = new Date(data.check_in);
   const checkOut = new Date(data.check_out);
-
-  if (checkOut <= checkIn) {
-    return { error: "Check-out must be after check-in" };
-  }
 
   const nights = Math.ceil(
     (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)

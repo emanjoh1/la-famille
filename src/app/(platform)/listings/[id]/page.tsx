@@ -27,6 +27,7 @@ import { ReviewList } from "@/components/reviews/ReviewList";
 import { SaveButton } from "@/components/listings/SaveButton";
 import { ShareButton } from "@/components/listings/ShareButton";
 import { MobileBookingButton } from "./ListingClient";
+import { LocationMap } from "@/components/map/LocationMap";
 import type { LucideIcon } from "lucide-react";
 
 const AMENITY_ICONS: Record<string, LucideIcon> = {
@@ -180,6 +181,9 @@ export default async function ListingDetailPage({
               </div>
             </div>
           )}
+
+          {/* Location Map */}
+          <LocationMap location={listing.location} />
 
           {/* Reviews */}
           <div className="py-6">
