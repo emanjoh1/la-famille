@@ -5,6 +5,7 @@ import { Star, AlertCircle } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import { createBooking } from "@/actions/bookings";
 import { useRouter } from "next/navigation";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 interface BookingWidgetProps {
   listing: {
@@ -21,6 +22,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const [guests, setGuests] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useLanguageContext();
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -37,11 +39,11 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const handleReserve = async () => {
     setError(null);
     if (!checkIn || !checkOut) {
-      setError("Please select check-in and check-out dates.");
+      setError(t("booking.select_dates"));
       return;
     }
     if (nights === 0) {
-      setError("Check-out must be after check-in.");
+      setError(t("booking.checkout_after_checkin"));
       return;
     }
     setLoading(true);
@@ -99,11 +101,11 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
           <span className="text-2xl font-bold text-gray-900">
             {listing.price_per_night.toLocaleString()} XAF
           </span>
-          <span className="text-gray-500"> / night</span>
+          <span className="text-gray-500"> {t("listing.per_night")}</span>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg">
           <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
-          <span className="text-sm font-semibold text-gray-900">New</span>
+          <span className="text-sm font-semibold text-gray-900">{t("booking.new_listing")}</span>
         </div>
       </div>
 
@@ -112,7 +114,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         <div className="grid grid-cols-2 divide-x divide-gray-200">
           <div className="p-3 hover:bg-gray-50 transition-colors">
             <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
-              Check in
+              {t("booking.check_in")}
             </label>
             <input
               type="date"
@@ -124,13 +126,13 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 if (checkOut && e.target.value >= checkOut) setCheckOut("");
               }}
               className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
-              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
+              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' } as React.CSSProperties}
               required
             />
           </div>
           <div className="p-3 hover:bg-gray-50 transition-colors">
             <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
-              Check out
+              {t("booking.check_out")}
             </label>
             <input
               type="date"
@@ -141,7 +143,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setError(null);
               }}
               className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
-              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
+              style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' } as React.CSSProperties}
               required
               disabled={!checkIn}
             />
@@ -149,7 +151,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         </div>
         <div className="border-t border-gray-200 p-3 hover:bg-gray-50 transition-colors">
           <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
-            Guests
+            {t("booking.guests")}
           </label>
           <select
             value={guests}
@@ -159,7 +161,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
             {Array.from({ length: listing.max_guests }, (_, i) => i + 1).map(
               (n) => (
                 <option key={n} value={n}>
-                  {n} guest{n !== 1 ? "s" : ""}
+                  {n} {n !== 1 ? t("common.guests") : t("common.guest")}
                 </option>
               )
             )}
@@ -179,15 +181,15 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       <button
         onClick={handleReserve}
         disabled={loading}
-        className="w-full py-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white
-                   font-bold text-base rounded-xl hover:from-[#1E40AF] hover:to-[#D01243]
+        className="w-full py-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white
+                   font-bold text-base rounded-xl hover:from-[#15803D] hover:to-[#D97706]
                    transition-all duration-200 mb-4 disabled:opacity-60 disabled:cursor-not-allowed
                    shadow-md hover:shadow-lg hover:scale-[1.02]"
       >
-        {loading ? "Reserving…" : "Reserve"}
+        {loading ? t("booking.reserving") : t("booking.reserve")}
       </button>
       <p className="text-center text-sm text-gray-600 mb-4">
-        You won&apos;t be charged yet
+        {t("booking.no_charge_yet")}
       </p>
 
       {/* Price breakdown */}
@@ -195,17 +197,16 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         <div className="space-y-3 pt-4 border-t border-gray-200">
           <div className="flex justify-between text-gray-900 text-sm">
             <span className="underline decoration-gray-400">
-              {listing.price_per_night.toLocaleString()} XAF × {nights} night
-              {nights !== 1 ? "s" : ""}
+              {listing.price_per_night.toLocaleString()} XAF × {nights} {nights !== 1 ? t("common.nights") : t("common.night")}
             </span>
             <span className="font-semibold">{subtotal.toLocaleString()} XAF</span>
           </div>
           <div className="flex justify-between text-gray-900 text-sm">
-            <span className="underline decoration-gray-400">La Famille service fee</span>
+            <span className="underline decoration-gray-400">{t("booking.service_fee_label")}</span>
             <span className="font-semibold">{serviceFee.toLocaleString()} XAF</span>
           </div>
           <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-900 text-base">
-            <span>Total before taxes</span>
+            <span>{t("booking.total_before_taxes")}</span>
             <span>{total.toLocaleString()} XAF</span>
           </div>
         </div>

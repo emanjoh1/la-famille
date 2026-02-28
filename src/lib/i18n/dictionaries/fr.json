@@ -17,7 +17,29 @@
     "sign_out": "Se deconnecter",
     "my_account": "Mon compte",
     "settings": "Parametres",
-    "help": "Aide"
+    "help": "Aide",
+    "support": "Aide",
+    "about_us": "A propos",
+    "careers": "Carrieres",
+    "faq": "FAQ",
+    "night": "nuit",
+    "nights": "nuits",
+    "guest": "voyageur",
+    "guests": "voyageurs",
+    "bed": "lit",
+    "beds": "lits",
+    "bath": "salle de bain",
+    "baths": "salles de bain",
+    "verified": "Annonces verifiees",
+    "verified_desc": "Chaque propriete est examinee et approuvee par notre equipe",
+    "local": "Experience locale",
+    "local_desc": "Sejournez avec des hotes de confiance qui connaissent le Cameroun",
+    "best_price": "Meilleurs prix",
+    "best_price_desc": "Tarifs competitifs sans frais caches",
+    "explore_cameroon": "Explorez le Cameroun",
+    "popular_destinations": "Destinations populaires qui vous attendent",
+    "ready_journey": "Pret a commencer votre voyage ?",
+    "join_travelers": "Rejoignez des milliers de voyageurs trouvant leur sejour parfait"
   },
   "nav": {
     "home": "Accueil",
@@ -28,7 +50,13 @@
     "become_host": "Devenir hote",
     "host_dashboard": "Tableau de bord hote",
     "profile": "Profil",
-    "language": "Langue"
+    "language": "Langue",
+    "host_your_home": "Hebergez votre logement",
+    "admin_panel": "Panel Admin",
+    "trips": "Voyages",
+    "wishlists": "Favoris",
+    "support": "Aide",
+    "where_to": "Ou aller ?"
   },
   "hero": {
     "title": "Vivez le Cameroun autrement",
@@ -52,7 +80,13 @@
     "amenities": "Equipements",
     "clear_filters": "Effacer les filtres",
     "results_count": "{count} logements trouves",
-    "no_results": "Aucun resultat pour cette recherche. Essayez de modifier vos criteres."
+    "no_results": "Aucun resultat pour cette recherche. Essayez de modifier vos criteres.",
+    "search_destinations": "Rechercher des destinations",
+    "results_in": "Sejours a",
+    "results_cameroon": "Sejours au Cameroun",
+    "property": "propriete",
+    "properties": "proprietes",
+    "try_adjusting": "Essayez d'ajuster votre recherche ou vos filtres"
   },
   "listing": {
     "per_night": "/ nuit",
@@ -73,7 +107,11 @@
     "save": "Enregistrer",
     "saved": "Enregistre",
     "similar_listings": "Logements similaires",
-    "show_all_photos": "Afficher toutes les photos"
+    "show_all_photos": "Afficher toutes les photos",
+    "where_youll_be": "Ou vous serez",
+    "hosted_by": "Heberge par {name}",
+    "remove_favorite": "Retirer des favoris",
+    "add_favorite": "Ajouter aux favoris"
   },
   "booking": {
     "reserve": "Reserver",
@@ -93,7 +131,18 @@
     "my_trips": "Mes voyages",
     "upcoming": "A venir",
     "past": "Passes",
-    "no_bookings": "Vous n'avez aucune reservation pour le moment"
+    "no_bookings": "Vous n'avez aucune reservation pour le moment",
+    "reserving": "Reservation en cours...",
+    "no_charge_yet": "Aucun montant ne sera debite pour le moment",
+    "select_dates": "Veuillez selectionner les dates d'arrivee et de depart.",
+    "checkout_after_checkin": "La date de depart doit etre apres la date d'arrivee.",
+    "no_trips_yet": "Aucun voyage reserve... pour l'instant !",
+    "start_planning": "Il est temps de preparer vos valises et de planifier votre prochaine aventure",
+    "start_searching": "Commencer a chercher",
+    "new_listing": "Nouveau",
+    "total_before_taxes": "Total avant taxes",
+    "service_fee_label": "Frais de service La Famille",
+    "write_review": "Ecrire un avis"
   },
   "host": {
     "dashboard": "Tableau de bord",
@@ -108,7 +157,15 @@
     "unpublish": "Depublier",
     "delete_listing": "Supprimer l'annonce",
     "listing_created": "Annonce creee avec succes",
-    "listing_updated": "Annonce mise a jour avec succes"
+    "listing_updated": "Annonce mise a jour avec succes",
+    "add_listing": "Ajouter une annonce",
+    "ready_to_host": "Pret a devenir hote ?",
+    "share_space": "Partagez votre espace et gagnez un revenu supplementaire. Votre premiere annonce ne prend que quelques minutes.",
+    "no_photos": "Pas encore de photos",
+    "under_review": "En cours d'examen",
+    "live": "En ligne",
+    "rejected": "Rejete",
+    "snoozed": "En pause"
   },
   "listing_form": {
     "step_basics": "Informations de base",
@@ -157,13 +214,20 @@
     "type_message": "Ecrivez votre message...",
     "send": "Envoyer",
     "no_messages": "Aucun message dans cette conversation",
-    "no_conversations": "Vous n'avez aucune conversation pour le moment"
+    "no_conversations": "Vous n'avez aucune conversation pour le moment",
+    "no_messages_yet": "Aucun message pour le moment",
+    "book_to_message": "Lorsque vous reservez un sejour, vous pourrez contacter votre hote ici",
+    "your_messages": "Vos messages",
+    "select_conversation": "Selectionnez une conversation pour lire les messages"
   },
   "favorites": {
     "my_favorites": "Mes favoris",
     "no_favorites": "Vous n'avez pas encore de favoris. Explorez nos logements et enregistrez ceux qui vous plaisent !",
     "remove_from_favorites": "Retirer des favoris",
-    "add_to_favorites": "Ajouter aux favoris"
+    "add_to_favorites": "Ajouter aux favoris",
+    "create_first": "Creez votre premiere liste de favoris",
+    "save_hint": "En parcourant les annonces, appuyez sur le coeur pour enregistrer vos logements preferes",
+    "start_exploring": "Commencer a explorer"
   },
   "footer": {
     "about": "A propos de La Famille",
@@ -173,7 +237,14 @@
     "privacy": "Politique de confidentialite",
     "help_center": "Centre d'aide",
     "host_resources": "Ressources pour les hotes",
-    "copyright": "\u00a9 {year} La Famille. Tous droits reserves."
+    "copyright": "\u00a9 {year} La Famille. Tous droits reserves.",
+    "tagline": "Votre chez-vous loin de chez vous au Cameroun",
+    "company": "Entreprise",
+    "resources": "Ressources",
+    "legal": "Mentions legales",
+    "careers": "Carrieres",
+    "cookie_policy": "Politique de cookies",
+    "become_host": "Devenir hote"
   },
   "categories": {
     "apartment": "Appartement",

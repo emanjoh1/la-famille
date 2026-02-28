@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { createReview } from "@/actions/reviews";
 import { useRouter } from "next/navigation";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 export function ReviewForm({ bookingId, listingId }: { bookingId: string; listingId: string }) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
     value: 0,
   });
   const [comment, setComment] = useState("");
+  const { t } = useLanguageContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +65,7 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
           >
             <Star
               className={`w-8 h-8 ${
-                star <= value ? "fill-[#1E3A8A] text-[#1E3A8A]" : "text-gray-300"
+                star <= value ? "fill-[#166534] text-[#166534]" : "text-gray-300"
               }`}
             />
           </button>
@@ -75,55 +77,55 @@ export function ReviewForm({ bookingId, listingId }: { bookingId: string; listin
   return (
     <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-8">
       <RatingInput
-        label="Overall Rating *"
+        label={`${t("review.overall")} *`}
         value={ratings.overall}
         onChange={(v) => setRatings({ ...ratings, overall: v })}
       />
 
       <RatingInput
-        label="Cleanliness"
+        label={t("review.cleanliness")}
         value={ratings.cleanliness}
         onChange={(v) => setRatings({ ...ratings, cleanliness: v })}
       />
 
       <RatingInput
-        label="Communication"
+        label={t("review.communication")}
         value={ratings.communication}
         onChange={(v) => setRatings({ ...ratings, communication: v })}
       />
 
       <RatingInput
-        label="Location"
+        label={t("review.location")}
         value={ratings.location}
         onChange={(v) => setRatings({ ...ratings, location: v })}
       />
 
       <RatingInput
-        label="Value"
+        label={t("review.value")}
         value={ratings.value}
         onChange={(v) => setRatings({ ...ratings, value: v })}
       />
 
       <div className="mb-6">
         <label className="block text-sm font-semibold text-gray-900 mb-2">
-          Your Review
+          {t("review.comment")}
         </label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={6}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent resize-none"
-          placeholder="Share your experience..."
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent resize-none"
+          placeholder={t("review.comment_placeholder")}
         />
       </div>
 
       <button
         type="submit"
         disabled={loading || ratings.overall === 0}
-        className="w-full py-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl font-bold
+        className="w-full py-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-xl font-bold
                    hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "Submitting..." : "Submit Review"}
+        {loading ? t("common.loading") : t("review.submit_review")}
       </button>
     </form>
   );

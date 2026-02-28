@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Send, MessageCircle } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import type { Message, Conversation } from "@/types/database";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 interface ConversationWithListing extends Conversation {
   listings?: { id: string; title: string; location: string; images?: string[] } | null;
@@ -27,6 +28,7 @@ export default function ConversationPage() {
   const [conversations, setConversations] = useState<ConversationWithListing[]>([]);
   const [content, setContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguageContext();
 
   useEffect(() => {
     if (conversationId) {
@@ -80,14 +82,14 @@ export default function ConversationPage() {
   if (!conversation) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-6 h-[600px] flex items-center justify-center">
-        <div className="text-[#717171]">Loading...</div>
+        <div className="text-[#717171]">{t("common.loading")}</div>
       </div>
     );
   }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-6">Messages</h1>
+      <h1 className="text-3xl font-semibold text-[#222222] mb-6">{t("nav.messages")}</h1>
 
       <div
         className="flex border border-[#DDDDDD] rounded-2xl overflow-hidden"
@@ -103,7 +105,7 @@ export default function ConversationPage() {
                           hover:bg-[#F7F7F7] transition-colors
                           ${conv.id === conversationId ? "bg-[#F7F7F7]" : ""}`}
             >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 flex items-center justify-center">
                 <span className="text-white font-semibold text-sm">H</span>
               </div>
               <div className="flex-1 min-w-0">
@@ -141,7 +143,7 @@ export default function ConversationPage() {
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <MessageCircle className="w-10 h-10 text-[#DDDDDD] mb-3" />
-                <p className="text-[#717171] text-sm">No messages yet. Say hello!</p>
+                <p className="text-[#717171] text-sm">{t("messages.no_messages")}</p>
               </div>
             )}
             {messages.map((msg) => {
@@ -155,7 +157,7 @@ export default function ConversationPage() {
                     <div
                       className={`px-4 py-2.5 rounded-2xl text-sm ${
                         isOwn
-                          ? "bg-[#1E3A8A] text-white rounded-br-sm"
+                          ? "bg-[#166534] text-white rounded-br-sm"
                           : "bg-[#F7F7F7] text-[#222222] rounded-bl-sm"
                       }`}
                     >
@@ -184,7 +186,7 @@ export default function ConversationPage() {
               type="text"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Message your host..."
+              placeholder={t("messages.type_message")}
               className="flex-1 px-5 py-3 border border-[#DDDDDD] rounded-full text-sm
                          text-[#222222] placeholder-[#717171] focus:outline-none
                          focus:border-[#222222] transition-colors"
@@ -192,9 +194,9 @@ export default function ConversationPage() {
             <button
               type="submit"
               disabled={!content.trim()}
-              className="p-3 bg-[#1E3A8A] text-white rounded-full hover:bg-[#1E40AF]
+              className="p-3 bg-[#166534] text-white rounded-full hover:bg-[#15803D]
                          disabled:bg-[#DDDDDD] transition-colors flex-shrink-0"
-              aria-label="Send"
+              aria-label={t("messages.send")}
             >
               <Send className="w-4 h-4" />
             </button>

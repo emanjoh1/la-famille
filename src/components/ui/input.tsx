@@ -39,10 +39,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               'flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 transition-colors duration-150',
               'placeholder:text-gray-400',
-              'focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500/20',
+              'focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20',
               'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-50',
               'dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 dark:placeholder:text-gray-500',
-              'dark:focus:border-rose-400 dark:focus:ring-rose-400/20',
+              'dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20',
               error
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
                 : 'border-gray-300',

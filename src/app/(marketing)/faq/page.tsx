@@ -71,10 +71,10 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 py-20">
+      <div className="bg-gradient-to-br from-green-50 to-emerald-100 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <HelpCircle className="w-8 h-8 text-blue-600" />
+            <HelpCircle className="w-8 h-8 text-emerald-700" />
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h1>
           <p className="text-xl text-gray-700">
@@ -101,14 +101,14 @@ export default function FAQPage() {
           </div>
         ))}
 
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-center text-white mt-16">
+        <div className="bg-gradient-to-r from-emerald-700 to-emerald-800 rounded-2xl p-12 text-center text-white mt-16">
           <h2 className="text-3xl font-bold mb-4">Still Have Questions?</h2>
           <p className="text-lg mb-8 opacity-90">
             Our support team is here to help you 24/7
           </p>
           <Link
             href="/support"
-            className="inline-block px-8 py-4 bg-white text-blue-600 rounded-xl font-bold hover:shadow-lg transition-all"
+            className="inline-block px-8 py-4 bg-white text-emerald-700 rounded-xl font-bold hover:shadow-lg transition-all"
           >
             Contact Support
           </Link>

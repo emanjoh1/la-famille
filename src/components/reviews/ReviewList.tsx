@@ -2,6 +2,7 @@
 
 import { Star } from "lucide-react";
 import Image from "next/image";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 interface Review {
   id: string;
@@ -13,8 +14,10 @@ interface Review {
 }
 
 export function ReviewList({ reviews }: { reviews: Review[] }) {
+  const { locale, t } = useLanguageContext();
+
   if (reviews.length === 0) {
-    return <p className="text-gray-600">No reviews yet. Be the first to review!</p>;
+    return <p className="text-gray-600">{t("listing.no_reviews")}</p>;
   }
 
   return (
@@ -22,7 +25,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
       {reviews.map((review) => (
         <div key={review.id} className="pb-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-200 to-orange-200">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-emerald-200 to-amber-200">
               {review.user_avatar ? (
                 <Image src={review.user_avatar} alt={review.user_name} fill className="object-cover" />
               ) : (
@@ -34,7 +37,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
             <div>
               <p className="font-semibold text-gray-900">{review.user_name}</p>
               <p className="text-sm text-gray-600">
-                {new Date(review.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                {new Date(review.created_at).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US", { month: 'long', year: 'numeric' })}
               </p>
             </div>
           </div>
@@ -43,7 +46,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
               <Star
                 key={i}
                 className={`w-4 h-4 ${
-                  i < review.overall_rating ? "fill-[#1E3A8A] text-[#1E3A8A]" : "text-gray-300"
+                  i < review.overall_rating ? "fill-[#166534] text-[#166534]" : "text-gray-300"
                 }`}
               />
             ))}

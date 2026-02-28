@@ -39,7 +39,7 @@ export default async function AdminPage() {
           label="Bookings"
           value={analytics.bookingStats.total.toString()}
           subtext={`${analytics.bookingStats.confirmed} confirmed`}
-          color="bg-blue-50 text-blue-600"
+          color="bg-green-50 text-emerald-700"
         />
         <StatCard
           icon={<Home className="w-6 h-6" />}
@@ -140,11 +140,11 @@ function NavCard({
       className="border border-[#DDDDDD] rounded-2xl p-6 hover:shadow-lg transition-shadow group relative"
     >
       {badge && (
-        <span className="absolute top-4 right-4 bg-[#1E3A8A] text-white text-xs font-bold px-2 py-1 rounded-full">
+        <span className="absolute top-4 right-4 bg-[#166534] text-white text-xs font-bold px-2 py-1 rounded-full">
           {badge}
         </span>
       )}
-      <div className="text-[#717171] group-hover:text-[#1E3A8A] transition-colors mb-4">
+      <div className="text-[#717171] group-hover:text-[#166534] transition-colors mb-4">
         {icon}
       </div>
       <h3 className="text-lg font-semibold text-[#222222] mb-2">{title}</h3>

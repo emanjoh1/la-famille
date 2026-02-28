@@ -49,7 +49,7 @@ export default async function AdminAnalyticsPage() {
           label="Avg Booking Value"
           value={`${avgBookingValue.toLocaleString()} XAF`}
           change="+8.2%"
-          color="bg-blue-50 text-blue-600"
+          color="bg-green-50 text-emerald-700"
         />
         <MetricCard
           icon={<Home className="w-6 h-6" />}
@@ -88,7 +88,7 @@ export default async function AdminAnalyticsPage() {
         <BreakdownCard
           title="Users"
           items={[
-            { label: "Guests", value: analytics.userStats.guests, color: "text-blue-600" },
+            { label: "Guests", value: analytics.userStats.guests, color: "text-emerald-700" },
             { label: "Hosts", value: analytics.userStats.hosts, color: "text-purple-600" },
             { label: "Admins", value: analytics.userStats.admins, color: "text-gray-600" },
           ]}

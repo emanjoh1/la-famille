@@ -79,8 +79,8 @@ export function LocationBasedListings({ fallbackListings }: { fallbackListings: 
             </button>
             
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-orange-100 rounded-full flex items-center justify-center mb-4">
-                <MapPin className="w-8 h-8 text-[#1E3A8A]" />
+              <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-orange-100 rounded-full flex items-center justify-center mb-4">
+                <MapPin className="w-8 h-8 text-[#166534]" />
               </div>
               
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -94,7 +94,7 @@ export function LocationBasedListings({ fallbackListings }: { fallbackListings: 
               <div className="flex flex-col gap-3 w-full">
                 <button
                   onClick={handleAllowLocation}
-                  className="w-full py-3 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl font-semibold
+                  className="w-full py-3 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-xl font-semibold
                              hover:shadow-lg hover:scale-105 transition-all duration-200"
                 >
                   Allow Location Access
@@ -114,11 +114,11 @@ export function LocationBasedListings({ fallbackListings }: { fallbackListings: 
       )}
 
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-orange-50 rounded-full mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-orange-50 rounded-full mb-4">
           {loading ? (
-            <Loader2 className="w-4 h-4 text-[#1E3A8A] animate-spin" />
+            <Loader2 className="w-4 h-4 text-[#166534] animate-spin" />
           ) : (
-            <MapPin className="w-4 h-4 text-[#1E3A8A]" />
+            <MapPin className="w-4 h-4 text-[#166534]" />
           )}
           <span className="text-sm font-semibold text-gray-900">
             {loading ? "Finding stays near you..." : userLocation ? `Near ${userLocation}` : "Suggested for you"}

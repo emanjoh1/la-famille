@@ -52,7 +52,7 @@ export default function AdminUsersPage() {
 
       <div className="grid grid-cols-3 gap-4 mb-10">
         <StatCard icon={<Crown className="w-5 h-5" />} label="Admins" value={admins.length} color="bg-purple-50 text-purple-600" />
-        <StatCard icon={<Shield className="w-5 h-5" />} label="Hosts" value={hosts.length} color="bg-blue-50 text-blue-600" />
+        <StatCard icon={<Shield className="w-5 h-5" />} label="Hosts" value={hosts.length} color="bg-green-50 text-emerald-700" />
         <StatCard icon={<User className="w-5 h-5" />} label="Guests" value={guests.length} color="bg-gray-50 text-gray-600" />
       </div>
 

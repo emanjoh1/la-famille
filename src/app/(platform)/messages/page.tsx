@@ -1,6 +1,7 @@
 import { getUserConversations } from "@/actions/messages";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { T } from "@/components/i18n/T";
 
 export const metadata = {
   title: "Messages | La Famille",
@@ -12,7 +13,7 @@ export default async function MessagesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-6">Messages</h1>
+      <h1 className="text-3xl font-semibold text-[#222222] mb-6"><T k="nav.messages" /></h1>
 
       <div className="flex border border-[#DDDDDD] rounded-2xl overflow-hidden min-h-[600px]">
         {/* Left sidebar */}
@@ -20,9 +21,9 @@ export default async function MessagesPage() {
           {conversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
               <MessageCircle className="w-10 h-10 text-[#DDDDDD] mb-4" />
-              <p className="font-semibold text-[#222222] mb-1">No messages yet</p>
+              <p className="font-semibold text-[#222222] mb-1"><T k="messages.no_messages_yet" /></p>
               <p className="text-sm text-[#717171]">
-                When you book a stay, you can message your host here
+                <T k="messages.book_to_message" />
               </p>
             </div>
           ) : (
@@ -34,7 +35,7 @@ export default async function MessagesPage() {
                   className="flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD]
                              hover:bg-[#F7F7F7] transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 flex items-center justify-center">
                     <span className="text-white font-semibold text-sm">H</span>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -55,8 +56,8 @@ export default async function MessagesPage() {
         <div className="hidden md:flex flex-1 items-center justify-center">
           <div className="text-center">
             <MessageCircle className="w-12 h-12 text-[#DDDDDD] mx-auto mb-4" />
-            <p className="text-xl font-semibold text-[#222222] mb-2">Your messages</p>
-            <p className="text-[#717171]">Select a conversation to read messages</p>
+            <p className="text-xl font-semibold text-[#222222] mb-2"><T k="messages.your_messages" /></p>
+            <p className="text-[#717171]"><T k="messages.select_conversation" /></p>
           </div>
         </div>
       </div>

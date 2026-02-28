@@ -10,8 +10,8 @@ export default function SupportPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <div className="text-center mb-12">
-        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-          <HelpCircle className="w-8 h-8 text-blue-600" />
+        <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+          <HelpCircle className="w-8 h-8 text-emerald-700" />
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-3">How Can We Help?</h1>
         <p className="text-lg text-gray-600">We're here to assist you with any questions or concerns</p>
@@ -19,12 +19,12 @@ export default function SupportPage() {
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         <div className="p-6 bg-white border border-gray-200 rounded-2xl text-center hover:shadow-lg transition-shadow">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="w-6 h-6 text-[#1E3A8A]" />
+          <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-6 h-6 text-[#166534]" />
           </div>
           <h3 className="font-bold text-gray-900 mb-2">Email Us</h3>
           <p className="text-sm text-gray-600 mb-3">Get a response within 24 hours</p>
-          <a href="mailto:support@lafamille.com" className="text-[#1E3A8A] font-semibold text-sm hover:underline">
+          <a href="mailto:support@lafamille.com" className="text-[#166534] font-semibold text-sm hover:underline">
             support@lafamille.com
           </a>
         </div>
@@ -58,7 +58,7 @@ export default function SupportPage() {
         <SupportForm />
       </div>
 
-      <div className="mt-12 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8">
+      <div className="mt-12 bg-gradient-to-r from-green-50 to-orange-50 rounded-2xl p-8">
         <h3 className="text-xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h3>
         <div className="space-y-4">
           <details className="group">

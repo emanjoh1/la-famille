@@ -15,7 +15,7 @@ export default async function HostProfilePage({ params }: { params: Promise<{ ho
     <div className="max-w-6xl mx-auto px-6 py-10">
       <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-8">
         <div className="flex items-start gap-6">
-          <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-200 to-orange-200 flex-shrink-0">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-emerald-200 to-orange-200 flex-shrink-0">
             {profile.avatar ? (
               <Image src={profile.avatar} alt={profile.name} fill className="object-cover" />
             ) : (
@@ -29,7 +29,7 @@ export default async function HostProfilePage({ params }: { params: Promise<{ ho
             <h1 className="text-4xl font-bold text-gray-900 mb-2">{profile.name}</h1>
             <div className="flex items-center gap-4 text-gray-600 mb-4">
               <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 fill-[#1E3A8A] text-[#1E3A8A]" />
+                <Star className="w-5 h-5 fill-[#166534] text-[#166534]" />
                 <span className="font-semibold">{profile.averageRating.toFixed(1)}</span>
                 <span>({profile.totalReviews} reviews)</span>
               </div>
@@ -40,15 +40,15 @@ export default async function HostProfilePage({ params }: { params: Promise<{ ho
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl">
-                <div className="flex items-center gap-2 text-[#1E3A8A] mb-1">
+              <div className="p-4 bg-gradient-to-br from-green-50 to-orange-50 rounded-xl">
+                <div className="flex items-center gap-2 text-[#166534] mb-1">
                   <Home className="w-5 h-5" />
                   <span className="font-bold text-2xl">{profile.totalListings}</span>
                 </div>
                 <p className="text-sm text-gray-600">Active Listings</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
-                <div className="flex items-center gap-2 text-blue-600 mb-1">
+              <div className="p-4 bg-gradient-to-br from-green-50 to-purple-50 rounded-xl">
+                <div className="flex items-center gap-2 text-emerald-700 mb-1">
                   <Star className="w-5 h-5" />
                   <span className="font-bold text-2xl">{profile.totalReviews}</span>
                 </div>
@@ -102,7 +102,7 @@ export default async function HostProfilePage({ params }: { params: Promise<{ ho
                     <Star
                       key={i}
                       className={`w-4 h-4 ${
-                        i < review.overall_rating ? "fill-[#1E3A8A] text-[#1E3A8A]" : "text-gray-300"
+                        i < review.overall_rating ? "fill-[#166534] text-[#166534]" : "text-gray-300"
                       }`}
                     />
                   ))}

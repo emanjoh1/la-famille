@@ -2,24 +2,11 @@ import { getListing } from "@/actions/listings";
 import { getListingReviews, getAverageRating } from "@/actions/reviews";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import Link from "next/link";
-import {
-  Star,
-  Wifi,
-  AirVent,
-  Car,
-  Waves,
-  CookingPot,
-  Tv,
-  Zap,
-  Droplets,
-  ShieldCheck,
-  Fence,
-  Flame,
-  WashingMachine,
-} from "lucide-react";
+import Image from "next/image";
+import { Star } from "lucide-react";
 import { AMENITIES } from "@/lib/utils/constants";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { ImageGallery } from "@/components/listings/ImageGallery";
@@ -28,22 +15,8 @@ import { SaveButton } from "@/components/listings/SaveButton";
 import { ShareButton } from "@/components/listings/ShareButton";
 import { MobileBookingButton } from "./ListingClient";
 import { LocationMap } from "@/components/map/LocationMap";
-import type { LucideIcon } from "lucide-react";
-
-const AMENITY_ICONS: Record<string, LucideIcon> = {
-  wifi: Wifi,
-  ac: AirVent,
-  parking: Car,
-  pool: Waves,
-  kitchen: CookingPot,
-  washer: WashingMachine,
-  tv: Tv,
-  generator: Zap,
-  water_tank: Droplets,
-  security_guard: ShieldCheck,
-  gated: Fence,
-  hot_water: Flame,
-};
+import { AmenityList } from "@/components/listings/AmenityList";
+import { T } from "@/components/i18n/T";
 
 export async function generateMetadata({
   params,
@@ -96,6 +69,18 @@ export default async function ListingDetailPage({
     isSaved = !!data;
   }
 
+  // Fetch host info
+  let hostName = "Host";
+  let hostAvatar: string | null = null;
+  try {
+    const clerk = await clerkClient();
+    const hostUser = await clerk.users.getUser(listing.user_id);
+    hostName = hostUser.fullName || hostUser.firstName || "Host";
+    hostAvatar = hostUser.imageUrl || null;
+  } catch {
+    // fallback to defaults
+  }
+
   const amenityDetails = AMENITIES.filter((a) =>
     listing.amenities?.includes(a.key)
   );
@@ -126,25 +111,30 @@ export default async function ListingDetailPage({
               {listing.location}
             </h2>
             <p className="text-[#717171]">
-              {listing.bedrooms} bedroom{listing.bedrooms !== 1 ? "s" : ""} ·{" "}
-              {listing.bathrooms} bathroom{listing.bathrooms !== 1 ? "s" : ""} ·
-              Up to {listing.max_guests} guest
-              {listing.max_guests !== 1 ? "s" : ""}
+              <T k="listing.bedrooms" vars={{ count: listing.bedrooms }} /> ·{" "}
+              <T k="listing.bathrooms" vars={{ count: listing.bathrooms }} /> ·{" "}
+              <T k="listing.guests" vars={{ count: listing.max_guests }} />
             </p>
           </div>
 
           {/* Host info */}
           <div className="py-6 border-b border-[#DDDDDD]">
             <Link href={`/host/${listing.user_id}`} className="flex items-center gap-4 hover:bg-gray-50 p-4 rounded-xl transition-colors">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-200 to-blue-400 flex-shrink-0 flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">H</span>
+              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 overflow-hidden">
+                {hostAvatar ? (
+                  <Image src={hostAvatar} alt={hostName} fill className="object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white font-semibold text-sm">
+                    {hostName[0]}
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-medium text-[#222222]">
-                  Hosted by La Famille host
+                  <T k="listing.hosted_by" vars={{ name: hostName }} />
                 </p>
                 <p className="text-sm text-[#717171]">
-                  View host profile →
+                  <T k="listing.contact_host" /> →
                 </p>
               </div>
             </Link>
@@ -158,29 +148,7 @@ export default async function ListingDetailPage({
           </div>
 
           {/* Amenities */}
-          {amenityDetails.length > 0 && (
-            <div className="py-6 border-b border-[#DDDDDD]">
-              <h3 className="text-xl font-semibold text-[#222222] mb-6">
-                What this place offers
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                {amenityDetails.map((amenity) => {
-                  const Icon = AMENITY_ICONS[amenity.key] ?? Wifi;
-                  return (
-                    <div
-                      key={amenity.key}
-                      className="flex items-center gap-4"
-                    >
-                      <Icon className="w-5 h-5 text-[#222222] flex-shrink-0" />
-                      <span className="text-[#222222]">
-                        {amenity.label_en}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <AmenityList amenities={amenityDetails} />
 
           {/* Location Map */}
           <LocationMap location={listing.location} />
@@ -195,13 +163,12 @@ export default async function ListingDetailPage({
                     {ratingData.average.toFixed(2)}
                   </span>
                   <span className="text-[#222222]">
-                    · {ratingData.count} review
-                    {ratingData.count !== 1 ? "s" : ""}
+                    · {ratingData.count} <T k="listing.reviews" />
                   </span>
                 </>
               ) : (
                 <span className="text-xl font-semibold text-[#222222]">
-                  New
+                  <T k="booking.new_listing" />
                 </span>
               )}
             </div>

@@ -42,7 +42,7 @@ export default async function AdminFinancialPage() {
           icon={<TrendingUp className="w-6 h-6" />}
           label="Platform Commission (14%)"
           value={`${report.summary.platformCommission.toLocaleString()} XAF`}
-          color="bg-blue-50 text-blue-600"
+          color="bg-green-50 text-emerald-700"
         />
         <SummaryCard
           icon={<Wallet className="w-6 h-6" />}
@@ -87,7 +87,7 @@ export default async function AdminFinancialPage() {
                     <td className="px-6 py-4 text-sm font-semibold text-[#222222] text-right">
                       {total.toLocaleString()} XAF
                     </td>
-                    <td className="px-6 py-4 text-sm text-blue-600 text-right">
+                    <td className="px-6 py-4 text-sm text-emerald-700 text-right">
                       {commission.toLocaleString()} XAF
                     </td>
                     <td className="px-6 py-4 text-sm text-green-600 text-right">

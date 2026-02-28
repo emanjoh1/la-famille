@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin } from "lucide-react";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 export function SearchBar({ today }: { today: string }) {
   const router = useRouter();
@@ -10,10 +11,11 @@ export function SearchBar({ today }: { today: string }) {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("");
+  const { t } = useLanguageContext();
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    
+
     const params = new URLSearchParams();
     if (location) params.set("location", location);
     if (checkIn) params.set("checkIn", checkIn);
@@ -29,12 +31,12 @@ export function SearchBar({ today }: { today: string }) {
         <div className="flex flex-col md:flex-row gap-2">
           <div className="flex-1 px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
             <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-[#1E3A8A]" />
+              <MapPin className="w-5 h-5 text-[#166534]" />
               <div className="flex-1">
-                <p className="text-xs font-bold text-gray-900 mb-1">Where</p>
+                <p className="text-xs font-bold text-gray-900 mb-1">{t("search.where")}</p>
                 <input
                   type="text"
-                  placeholder="Search destinations"
+                  placeholder={t("search.search_destinations")}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent focus:outline-none"
@@ -44,7 +46,7 @@ export function SearchBar({ today }: { today: string }) {
           </div>
 
           <div className="px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
-            <label className="text-xs font-bold text-gray-900 mb-1 block">Check in</label>
+            <label className="text-xs font-bold text-gray-900 mb-1 block">{t("booking.check_in")}</label>
             <input
               type="date"
               min={today}
@@ -58,7 +60,7 @@ export function SearchBar({ today }: { today: string }) {
           </div>
 
           <div className="px-5 py-3 hover:bg-gray-50 rounded-xl transition-colors">
-            <label className="text-xs font-bold text-gray-900 mb-1 block">Check out</label>
+            <label className="text-xs font-bold text-gray-900 mb-1 block">{t("booking.check_out")}</label>
             <input
               type="date"
               min={checkIn || today}
@@ -71,7 +73,7 @@ export function SearchBar({ today }: { today: string }) {
 
           <div className="flex items-center gap-3 px-5 py-3">
             <div className="flex-1">
-              <label className="text-xs font-bold text-gray-900 mb-1 block">Guests</label>
+              <label className="text-xs font-bold text-gray-900 mb-1 block">{t("booking.guests")}</label>
               <input
                 type="number"
                 min="1"
@@ -83,7 +85,7 @@ export function SearchBar({ today }: { today: string }) {
             </div>
             <button
               type="submit"
-              className="p-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl
+              className="p-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-xl
                          hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md"
             >
               <Search className="w-5 h-5" />
