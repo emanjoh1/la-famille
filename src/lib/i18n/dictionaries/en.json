@@ -265,5 +265,27 @@
     "ouest": "West",
     "sud": "South",
     "sud_ouest": "Southwest"
+  },
+  "support": {
+    "title": "How Can We Help?",
+    "subtitle": "We're here to assist you with any questions or concerns",
+    "email_us": "Email Us",
+    "email_response": "Get a response within 24 hours",
+    "call_us": "Call Us",
+    "call_hours": "Mon-Fri, 9AM-6PM WAT",
+    "live_chat": "Live Chat",
+    "chat_team": "Chat with our team",
+    "start_chat": "Start Chat",
+    "send_message": "Send Us a Message",
+    "form_description": "Fill out the form below and we'll get back to you as soon as possible",
+    "faq_title": "Frequently Asked Questions",
+    "faq_cancel_booking": "How do I cancel a booking?",
+    "faq_cancel_answer": "You can cancel pending bookings directly from your Trips page. For confirmed bookings, please contact support for assistance.",
+    "faq_become_host": "How do I become a host?",
+    "faq_become_host_answer": "Click \"Become a host\" in the navigation menu and follow the steps to list your property. Our team will review and approve your listing.",
+    "faq_payment_host": "When will I receive my payment as a host?",
+    "faq_payment_host_answer": "Payments are processed 24 hours after guest check-in. You'll receive your earnings minus the 14% service fee.",
+    "faq_payment_methods": "What payment methods do you accept?",
+    "faq_payment_methods_answer": "We accept all major credit cards, debit cards, and mobile money through our secure Stripe payment gateway."
   }
 }

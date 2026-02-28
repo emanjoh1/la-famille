@@ -265,5 +265,27 @@
     "ouest": "Ouest",
     "sud": "Sud",
     "sud_ouest": "Sud-Ouest"
+  },
+  "support": {
+    "title": "Comment pouvons-nous vous aider ?",
+    "subtitle": "Nous sommes la pour vous aider avec toutes vos questions ou preoccupations",
+    "email_us": "Envoyez-nous un email",
+    "email_response": "Reponse sous 24 heures",
+    "call_us": "Appelez-nous",
+    "call_hours": "Lun-Ven, 9h-18h WAT",
+    "live_chat": "Chat en direct",
+    "chat_team": "Discutez avec notre equipe",
+    "start_chat": "Demarrer le chat",
+    "send_message": "Envoyez-nous un message",
+    "form_description": "Remplissez le formulaire ci-dessous et nous vous repondrons dans les plus brefs delais",
+    "faq_title": "Questions frequemment posees",
+    "faq_cancel_booking": "Comment annuler une reservation ?",
+    "faq_cancel_answer": "Vous pouvez annuler les reservations en attente directement depuis votre page Voyages. Pour les reservations confirmees, veuillez contacter le support pour obtenir de l'aide.",
+    "faq_become_host": "Comment devenir hote ?",
+    "faq_become_host_answer": "Cliquez sur \"Devenir hote\" dans le menu de navigation et suivez les etapes pour lister votre propriete. Notre equipe examinera et approuvera votre annonce.",
+    "faq_payment_host": "Quand vais-je recevoir mon paiement en tant qu'hote ?",
+    "faq_payment_host_answer": "Les paiements sont traites 24 heures apres l'arrivee du voyageur. Vous recevrez vos gains moins les frais de service de 14%.",
+    "faq_payment_methods": "Quels modes de paiement acceptez-vous ?",
+    "faq_payment_methods_answer": "Nous acceptons toutes les principales cartes de credit, cartes de debit et mobile money via notre passerelle de paiement securisee Stripe."
   }
 }
