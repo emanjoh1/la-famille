@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 export function SearchBar() {
   const router = useRouter();
   const [location, setLocation] = useState("");
+  const { t } = useLanguageContext();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +25,13 @@ export function SearchBar() {
         type="text"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
-        placeholder="Search destinations"
+        placeholder={t("search.search_destinations")}
         className="flex-1 px-4 py-2 rounded-l-full focus:outline-none text-sm"
       />
       <button
         type="submit"
-        className="p-2 bg-[#1E3A8A] text-white rounded-full hover:bg-[#1E40AF] transition-colors flex-shrink-0 m-1"
-        aria-label="Search"
+        className="p-2 bg-[#166534] text-white rounded-full hover:bg-[#15803D] transition-colors flex-shrink-0 m-1"
+        aria-label={t("common.search")}
       >
         <Search className="w-4 h-4" />
       </button>

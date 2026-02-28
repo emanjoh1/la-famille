@@ -387,7 +387,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                          text-center hover:border-[#222222] transition-colors cursor-pointer"
             >
               <Upload className="w-8 h-8 mx-auto mb-3 text-[#717171]" />
-              <span className="text-[#1E3A8A] font-semibold block">Add more photos</span>
+              <span className="text-[#166534] font-semibold block">Add more photos</span>
               <p className="text-[#717171] text-sm mt-1">PNG, JPG up to 4MB</p>
             </label>
             <input
@@ -433,8 +433,8 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
             <button
               onClick={handleSubmit}
               disabled={submitting || uploading}
-              className="flex-1 px-6 py-3 bg-[#1E3A8A] text-white rounded-xl font-medium
-                         hover:bg-[#1E40AF] disabled:opacity-50 disabled:cursor-not-allowed
+              className="flex-1 px-6 py-3 bg-[#166534] text-white rounded-xl font-medium
+                         hover:bg-[#15803D] disabled:opacity-50 disabled:cursor-not-allowed
                          transition-colors"
             >
               {submitting ? "Saving..." : "Save changes"}

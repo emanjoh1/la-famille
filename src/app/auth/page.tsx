@@ -29,7 +29,7 @@ export default function AuthPage() {
               Don&apos;t have an account?{" "}
               <button
                 onClick={() => setMode("sign-up")}
-                className="text-blue-600 hover:underline"
+                className="text-emerald-700 hover:underline"
               >
                 Sign up
               </button>
@@ -42,7 +42,7 @@ export default function AuthPage() {
               Already have an account?{" "}
               <button
                 onClick={() => setMode("sign-in")}
-                className="text-blue-600 hover:underline"
+                className="text-emerald-700 hover:underline"
               >
                 Sign in
               </button>

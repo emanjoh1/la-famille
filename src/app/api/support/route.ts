@@ -19,11 +19,11 @@ export async function POST(request: NextRequest) {
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #1a1a1a; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
+            .header { background: linear-gradient(135deg, #166534 0%, #15803D 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; }
             .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
             .info { background: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0; }
             .label { font-weight: 600; color: #6b7280; }
-            .message-box { background: #fff; padding: 20px; border-left: 4px solid #1E3A8A; border-radius: 4px; margin: 20px 0; }
+            .message-box { background: #fff; padding: 20px; border-left: 4px solid #166534; border-radius: 4px; margin: 20px 0; }
           </style>
         </head>
         <body>

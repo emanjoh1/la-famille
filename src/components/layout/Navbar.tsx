@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Globe, Menu, Search } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +13,11 @@ export function Navbar() {
   const [checkOut, setCheckOut] = useState("");
   const { user } = useUser();
   const isAdmin = (user?.publicMetadata?.role as string) === "admin";
+  const { locale, setLocale, t } = useLanguageContext();
+
+  const toggleLanguage = () => {
+    setLocale(locale === "fr" ? "en" : "fr");
+  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -28,10 +34,10 @@ export function Navbar() {
 
           {/* Left: Logo */}
           <Link href="/explore" className="flex-shrink-0 flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#1E3A8A] to-[#1E40AF] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#166534] to-[#15803D] rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <span className="text-xl">🏠</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] bg-clip-text text-transparent">La Famille</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-[#166534] to-[#15803D] bg-clip-text text-transparent">La Famille</span>
           </Link>
 
           {/* Center: Search pill */}
@@ -40,7 +46,7 @@ export function Navbar() {
                           flex-1 max-w-2xl bg-white">
             <input
               type="text"
-              placeholder="Where to?"
+              placeholder={t("nav.where_to")}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -61,9 +67,9 @@ export function Navbar() {
             />
             <button
               onClick={handleSearch}
-              className="px-5 py-3 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-r-full
-                         hover:from-[#1E40AF] hover:to-[#D01243] transition-all duration-200 hover:shadow-md"
-              aria-label="Search"
+              className="px-5 py-3 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-r-full
+                         hover:from-[#15803D] hover:to-[#D97706] transition-all duration-200 hover:shadow-md"
+              aria-label={t("common.search")}
             >
               <Search className="w-5 h-5" />
             </button>
@@ -75,10 +81,10 @@ export function Navbar() {
               // Show Sign Up button for guests
               <Link
                 href="/auth"
-                className="px-6 py-3 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-full text-sm font-semibold
+                className="px-6 py-3 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-full text-sm font-semibold
                            hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md"
               >
-                Sign Up
+                {t("common.sign_up")}
               </Link>
             ) : (
               <>
@@ -87,13 +93,15 @@ export function Navbar() {
                   className="hidden md:block px-5 py-2.5 text-sm font-semibold text-gray-700
                              rounded-full hover:bg-gray-100 transition-all duration-200"
                 >
-                  Become a host
+                  {t("nav.become_host")}
                 </Link>
                 <button
-                  className="p-3 rounded-full hover:bg-gray-100 transition-all duration-200 hidden md:flex items-center justify-center"
-                  aria-label="Language"
+                  onClick={toggleLanguage}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-all duration-200 hidden md:flex items-center justify-center gap-1.5"
+                  aria-label={t("nav.language")}
                 >
                   <Globe className="w-5 h-5 text-gray-700" />
+                  <span className="text-xs font-bold text-gray-700 uppercase">{locale}</span>
                 </button>
 
                 {/* Hamburger + Avatar */}
@@ -122,28 +130,28 @@ export function Navbar() {
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
                         >
-                          Explore
+                          {t("nav.explore")}
                         </Link>
                         <Link
                           href="/bookings"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Trips
+                          {t("nav.trips")}
                         </Link>
                         <Link
                           href="/favorites"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Wishlists
+                          {t("nav.wishlists")}
                         </Link>
                         <Link
                           href="/messages"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Messages
+                          {t("nav.messages")}
                         </Link>
                         <div className="border-t border-gray-200 my-2" />
                         <Link
@@ -151,37 +159,37 @@ export function Navbar() {
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Support
+                          {t("nav.support")}
                         </Link>
                         <Link
                           href="/about"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          About Us
+                          {t("common.about_us")}
                         </Link>
                         <Link
                           href="/careers"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Careers
+                          {t("common.careers")}
                         </Link>
                         <Link
                           href="/faq"
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          FAQ
+                          {t("common.faq")}
                         </Link>
                         <div className="border-t border-gray-200 my-2" />
                         {isAdmin && (
                           <Link
                             href="/admin"
                             onClick={() => setMenuOpen(false)}
-                            className="block px-5 py-3 text-sm font-semibold text-[#1E3A8A] hover:bg-rose-50 transition-colors"
+                            className="block px-5 py-3 text-sm font-semibold text-[#166534] hover:bg-emerald-50 transition-colors"
                           >
-                            Admin Panel
+                            {t("nav.admin_panel")}
                           </Link>
                         )}
                         <Link
@@ -189,8 +197,21 @@ export function Navbar() {
                           onClick={() => setMenuOpen(false)}
                           className="block px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Host your home
+                          {t("nav.host_your_home")}
                         </Link>
+
+                        {/* Language toggle in dropdown for mobile */}
+                        <div className="border-t border-gray-200 my-2 md:hidden" />
+                        <button
+                          onClick={() => {
+                            toggleLanguage();
+                            setMenuOpen(false);
+                          }}
+                          className="w-full text-left px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 md:hidden"
+                        >
+                          <Globe className="w-4 h-4" />
+                          {locale === "fr" ? "English" : "Français"}
+                        </button>
                       </div>
                     </>
                   )}

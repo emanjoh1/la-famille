@@ -13,6 +13,7 @@ import {
 import { LISTING_CATEGORIES } from "@/lib/utils/constants";
 import type { LucideIcon } from "lucide-react";
 import { memo, useCallback } from "react";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Building2,
@@ -27,6 +28,7 @@ function CategoryBarInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const active = searchParams.get("category");
+  const { locale, t } = useLanguageContext();
 
   const handleCategoryClick = useCallback(
     (value: string) => {
@@ -50,6 +52,7 @@ function CategoryBarInner() {
             {LISTING_CATEGORIES.map((cat) => {
               const Icon = ICON_MAP[cat.icon] ?? Home;
               const isActive = active === cat.value;
+              const label = locale === "fr" ? cat.label_fr : cat.label_en;
               return (
                 <button
                   key={cat.value}
@@ -66,7 +69,7 @@ function CategoryBarInner() {
                   <span
                     className={`text-xs whitespace-nowrap ${isActive ? "font-semibold" : "font-medium"}`}
                   >
-                    {cat.label_en}
+                    {label}
                   </span>
                 </button>
               );
@@ -80,7 +83,7 @@ function CategoryBarInner() {
                          text-sm font-medium text-[#222222] hover:bg-[#F7F7F7] transition-colors"
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filters
+              {t("search.filters")}
             </button>
           </div>
         </div>

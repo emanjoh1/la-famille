@@ -2,7 +2,7 @@ import { type HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils/cn'
 
 const badgeVariants = {
-  default: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
+  default: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
   secondary:
     'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   success:

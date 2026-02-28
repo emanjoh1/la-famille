@@ -17,7 +17,29 @@
     "sign_out": "Sign out",
     "my_account": "My account",
     "settings": "Settings",
-    "help": "Help"
+    "help": "Help",
+    "support": "Support",
+    "about_us": "About Us",
+    "careers": "Careers",
+    "faq": "FAQ",
+    "night": "night",
+    "nights": "nights",
+    "guest": "guest",
+    "guests": "guests",
+    "bed": "bed",
+    "beds": "beds",
+    "bath": "bath",
+    "baths": "baths",
+    "verified": "Verified Listings",
+    "verified_desc": "Every property is reviewed and approved by our team",
+    "local": "Local Experience",
+    "local_desc": "Stay with trusted hosts who know Cameroon best",
+    "best_price": "Best Prices",
+    "best_price_desc": "Competitive rates with no hidden fees",
+    "explore_cameroon": "Explore Cameroon",
+    "popular_destinations": "Popular destinations waiting for you",
+    "ready_journey": "Ready to Start Your Journey?",
+    "join_travelers": "Join thousands of travelers finding their perfect stay"
   },
   "nav": {
     "home": "Home",
@@ -28,7 +50,13 @@
     "become_host": "Become a host",
     "host_dashboard": "Host dashboard",
     "profile": "Profile",
-    "language": "Language"
+    "language": "Language",
+    "host_your_home": "Host your home",
+    "admin_panel": "Admin Panel",
+    "trips": "Trips",
+    "wishlists": "Wishlists",
+    "support": "Support",
+    "where_to": "Where to?"
   },
   "hero": {
     "title": "Discover Cameroon like never before",
@@ -52,7 +80,13 @@
     "amenities": "Amenities",
     "clear_filters": "Clear filters",
     "results_count": "{count} listings found",
-    "no_results": "No results for this search. Try changing your criteria."
+    "no_results": "No results for this search. Try changing your criteria.",
+    "search_destinations": "Search destinations",
+    "results_in": "Stays in",
+    "results_cameroon": "Stays in Cameroon",
+    "property": "property",
+    "properties": "properties",
+    "try_adjusting": "Try adjusting your search or filters"
   },
   "listing": {
     "per_night": "/ night",
@@ -73,12 +107,16 @@
     "save": "Save",
     "saved": "Saved",
     "similar_listings": "Similar listings",
-    "show_all_photos": "Show all photos"
+    "show_all_photos": "Show all photos",
+    "where_youll_be": "Where you'll be",
+    "hosted_by": "Hosted by {name}",
+    "remove_favorite": "Remove from favorites",
+    "add_favorite": "Add to favorites"
   },
   "booking": {
     "reserve": "Reserve",
-    "check_in": "Check-in",
-    "check_out": "Check-out",
+    "check_in": "Check in",
+    "check_out": "Check out",
     "guests": "Guests",
     "price_per_night": "Price per night",
     "nights": "{count} night(s)",
@@ -93,7 +131,18 @@
     "my_trips": "My trips",
     "upcoming": "Upcoming",
     "past": "Past",
-    "no_bookings": "You have no bookings yet"
+    "no_bookings": "You have no bookings yet",
+    "reserving": "Reserving...",
+    "no_charge_yet": "You won't be charged yet",
+    "select_dates": "Please select check-in and check-out dates.",
+    "checkout_after_checkin": "Check-out must be after check-in.",
+    "no_trips_yet": "No trips booked... yet!",
+    "start_planning": "Time to dust off your bags and start planning your next adventure",
+    "start_searching": "Start searching",
+    "new_listing": "New",
+    "total_before_taxes": "Total before taxes",
+    "service_fee_label": "La Famille service fee",
+    "write_review": "Write Review"
   },
   "host": {
     "dashboard": "Dashboard",
@@ -108,7 +157,15 @@
     "unpublish": "Unpublish",
     "delete_listing": "Delete listing",
     "listing_created": "Listing created successfully",
-    "listing_updated": "Listing updated successfully"
+    "listing_updated": "Listing updated successfully",
+    "add_listing": "Add listing",
+    "ready_to_host": "Ready to be a host?",
+    "share_space": "Share your space and earn extra income. Your first listing takes just a few minutes.",
+    "no_photos": "No photos yet",
+    "under_review": "Under review",
+    "live": "Live",
+    "rejected": "Rejected",
+    "snoozed": "Snoozed"
   },
   "listing_form": {
     "step_basics": "Basic information",
@@ -157,13 +214,20 @@
     "type_message": "Type your message...",
     "send": "Send",
     "no_messages": "No messages in this conversation",
-    "no_conversations": "You have no conversations yet"
+    "no_conversations": "You have no conversations yet",
+    "no_messages_yet": "No messages yet",
+    "book_to_message": "When you book a stay, you can message your host here",
+    "your_messages": "Your messages",
+    "select_conversation": "Select a conversation to read messages"
   },
   "favorites": {
     "my_favorites": "My favorites",
     "no_favorites": "You have no favorites yet. Explore our listings and save the ones you like!",
     "remove_from_favorites": "Remove from favorites",
-    "add_to_favorites": "Add to favorites"
+    "add_to_favorites": "Add to favorites",
+    "create_first": "Create your first wishlist",
+    "save_hint": "As you search, tap the heart icon to save your favourite places to a wishlist",
+    "start_exploring": "Start exploring"
   },
   "footer": {
     "about": "About La Famille",
@@ -173,7 +237,14 @@
     "privacy": "Privacy policy",
     "help_center": "Help center",
     "host_resources": "Host resources",
-    "copyright": "\u00a9 {year} La Famille. All rights reserved."
+    "copyright": "\u00a9 {year} La Famille. All rights reserved.",
+    "tagline": "Your home away from home across Cameroon",
+    "company": "Company",
+    "resources": "Resources",
+    "legal": "Legal",
+    "careers": "Careers",
+    "cookie_policy": "Cookie Policy",
+    "become_host": "Become a Host"
   },
   "categories": {
     "apartment": "Apartment",
@@ -194,5 +265,27 @@
     "ouest": "West",
     "sud": "South",
     "sud_ouest": "Southwest"
+  },
+  "support": {
+    "title": "How Can We Help?",
+    "subtitle": "We're here to assist you with any questions or concerns",
+    "email_us": "Email Us",
+    "email_response": "Get a response within 24 hours",
+    "call_us": "Call Us",
+    "call_hours": "Mon-Fri, 9AM-6PM WAT",
+    "live_chat": "Live Chat",
+    "chat_team": "Chat with our team",
+    "start_chat": "Start Chat",
+    "send_message": "Send Us a Message",
+    "form_description": "Fill out the form below and we'll get back to you as soon as possible",
+    "faq_title": "Frequently Asked Questions",
+    "faq_cancel_booking": "How do I cancel a booking?",
+    "faq_cancel_answer": "You can cancel pending bookings directly from your Trips page. For confirmed bookings, please contact support for assistance.",
+    "faq_become_host": "How do I become a host?",
+    "faq_become_host_answer": "Click \"Become a host\" in the navigation menu and follow the steps to list your property. Our team will review and approve your listing.",
+    "faq_payment_host": "When will I receive my payment as a host?",
+    "faq_payment_host_answer": "Payments are processed 24 hours after guest check-in. You'll receive your earnings minus the 14% service fee.",
+    "faq_payment_methods": "What payment methods do you accept?",
+    "faq_payment_methods_answer": "We accept all major credit cards, debit cards, and mobile money through our secure Stripe payment gateway."
   }
 }

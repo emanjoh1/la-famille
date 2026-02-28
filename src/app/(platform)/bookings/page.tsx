@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
 import { BookingActions } from "@/components/booking/BookingActions";
+import { T } from "@/components/i18n/T";
 
 export const metadata = {
   title: "Trips | La Famille",
@@ -20,7 +21,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default async function BookingsPage() {
   const bookings = await getUserBookings();
-  
+
   const bookingsWithReviewStatus = await Promise.all(
     bookings.map(async (booking) => ({
       ...booking,
@@ -30,22 +31,22 @@ export default async function BookingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-8">Trips</h1>
+      <h1 className="text-3xl font-semibold text-[#222222] mb-8"><T k="nav.trips" /></h1>
 
       {bookingsWithReviewStatus.length === 0 ? (
         <div className="border border-[#DDDDDD] rounded-2xl p-12 text-center">
           <p className="text-2xl font-semibold text-[#222222] mb-3">
-            No trips booked... yet!
+            <T k="booking.no_trips_yet" />
           </p>
           <p className="text-[#717171] mb-8 max-w-sm mx-auto">
-            Time to dust off your bags and start planning your next adventure
+            <T k="booking.start_planning" />
           </p>
           <Link
             href="/explore"
             className="inline-block px-6 py-3 border border-[#222222] rounded-xl
                        text-[#222222] font-medium hover:bg-[#F7F7F7] transition-colors"
           >
-            Start searching
+            <T k="booking.start_searching" />
           </Link>
         </div>
       ) : (
@@ -106,10 +107,10 @@ export default async function BookingsPage() {
                 {booking.canReview && (
                   <Link
                     href={`/bookings/${booking.id}/review`}
-                    className="px-4 py-2 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl text-sm font-semibold
+                    className="px-4 py-2 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-xl text-sm font-semibold
                                hover:shadow-lg transition-all text-center"
                   >
-                    Write Review
+                    <T k="booking.write_review" />
                   </Link>
                 )}
               </div>

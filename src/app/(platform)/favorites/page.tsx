@@ -2,6 +2,7 @@ import { getUserFavorites } from "@/actions/favorites";
 import { ListingCard } from "@/components/listings/ListingCard";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { T } from "@/components/i18n/T";
 
 export const metadata = {
   title: "Wishlists | La Famille",
@@ -13,23 +14,23 @@ export default async function FavoritesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-8">Wishlists</h1>
+      <h1 className="text-3xl font-semibold text-[#222222] mb-8"><T k="nav.wishlists" /></h1>
 
       {favorites.length === 0 ? (
         <div className="border border-[#DDDDDD] rounded-2xl p-12 text-center">
           <Heart className="w-10 h-10 text-[#717171] mx-auto mb-4" />
           <p className="text-2xl font-semibold text-[#222222] mb-3">
-            Create your first wishlist
+            <T k="favorites.create_first" />
           </p>
           <p className="text-[#717171] mb-8 max-w-sm mx-auto">
-            As you search, tap the heart icon to save your favourite places to a wishlist
+            <T k="favorites.save_hint" />
           </p>
           <Link
             href="/explore"
             className="inline-block px-6 py-3 border border-[#222222] rounded-xl
                        text-[#222222] font-medium hover:bg-[#F7F7F7] transition-colors"
           >
-            Start exploring
+            <T k="favorites.start_exploring" />
           </Link>
         </div>
       ) : (

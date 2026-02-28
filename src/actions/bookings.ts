@@ -16,6 +16,20 @@ export async function createBooking(data: {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
+  // Validate dates are not in the past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkInDate = new Date(data.check_in);
+  const checkOutDate = new Date(data.check_out);
+
+  if (checkInDate < today) {
+    return { error: "Check-in date cannot be in the past" };
+  }
+
+  if (checkOutDate <= checkInDate) {
+    return { error: "Check-out must be after check-in" };
+  }
+
   // Fetch listing to validate and get real price
   const { data: listing, error: listingError } = await supabaseAdmin
     .from("listings")
@@ -39,10 +53,6 @@ export async function createBooking(data: {
 
   const checkIn = new Date(data.check_in);
   const checkOut = new Date(data.check_out);
-
-  if (checkOut <= checkIn) {
-    return { error: "Check-out must be after check-in" };
-  }
 
   const nights = Math.ceil(
     (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
@@ -142,15 +152,15 @@ export async function createBooking(data: {
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #1a1a1a; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
+              .header { background: linear-gradient(135deg, #166534 0%, #15803D 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
               .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
               .details { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
               .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
               .detail-row:last-child { border-bottom: none; }
               .label { font-weight: 600; color: #6b7280; }
               .value { font-weight: 600; color: #1a1a1a; }
-              .total { background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #1E3A8A; }
-              .button { display: inline-block; background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+              .total { background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #166534; }
+              .button { display: inline-block; background: linear-gradient(135deg, #166534 0%, #15803D 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
               .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
             </style>
           </head>
@@ -193,7 +203,7 @@ export async function createBooking(data: {
                   <div class="total">
                     <div class="detail-row" style="border: none;">
                       <span class="label" style="font-size: 18px; color: #1a1a1a;">Total Amount</span>
-                      <span class="value" style="font-size: 20px; color: #1E3A8A;">${Number(result.total_price).toLocaleString()} XAF</span>
+                      <span class="value" style="font-size: 20px; color: #166534;">${Number(result.total_price).toLocaleString()} XAF</span>
                     </div>
                   </div>
                 </div>

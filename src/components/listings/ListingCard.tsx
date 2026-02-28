@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Heart, Star } from "lucide-react";
 import { useState, memo, useCallback } from "react";
 import { toggleFavorite } from "@/actions/favorites";
+import { useLanguageContext } from "@/lib/i18n/provider";
 
 interface ListingCardProps {
   id: string;
@@ -30,6 +31,7 @@ function ListingCardInner({
   rating,
 }: ListingCardProps) {
   const [hearted, setHearted] = useState(isFavorited);
+  const { t } = useLanguageContext();
 
   const handleHeart = useCallback(
     async (e: React.MouseEvent) => {
@@ -67,12 +69,12 @@ function ListingCardInner({
         <button
           onClick={handleHeart}
           className="absolute top-3 right-3 p-1 hover:scale-110 transition-transform"
-          aria-label={hearted ? "Remove from favorites" : "Add to favorites"}
+          aria-label={hearted ? t("listing.remove_favorite") : t("listing.add_favorite")}
         >
           <Heart
             className={`w-6 h-6 drop-shadow transition-colors ${
               hearted
-                ? "text-[#1E3A8A] fill-[#1E3A8A]"
+                ? "text-[#166534] fill-[#166534]"
                 : "text-white fill-black/30"
             }`}
           />
@@ -96,14 +98,13 @@ function ListingCardInner({
         </div>
         <p className="text-[#717171] text-sm truncate">{title}</p>
         <p className="text-[#717171] text-sm">
-          {bedrooms} bed{bedrooms !== 1 ? "s" : ""} · {bathrooms} bath
-          {bathrooms !== 1 ? "s" : ""}
+          {bedrooms} {bedrooms !== 1 ? t("common.beds") : t("common.bed")} · {bathrooms} {bathrooms !== 1 ? t("common.baths") : t("common.bath")}
         </p>
         <p className="text-[#222222]">
           <span className="font-semibold">
             {price_per_night.toLocaleString()} XAF
           </span>
-          <span className="font-normal text-[#717171]"> / night</span>
+          <span className="font-normal text-[#717171]"> {t("listing.per_night")}</span>
         </p>
       </div>
     </Link>

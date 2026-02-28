@@ -51,7 +51,7 @@ export function SupportForm() {
             required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent"
             placeholder="John Doe"
           />
         </div>
@@ -65,7 +65,7 @@ export function SupportForm() {
             required
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent"
             placeholder="john@example.com"
           />
         </div>
@@ -78,7 +78,7 @@ export function SupportForm() {
         <select
           value={formData.category}
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent"
         >
           <option value="general">General Inquiry</option>
           <option value="booking">Booking Issue</option>
@@ -98,7 +98,7 @@ export function SupportForm() {
           required
           value={formData.subject}
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent"
           placeholder="Brief description of your issue"
         />
       </div>
@@ -112,7 +112,7 @@ export function SupportForm() {
           rows={6}
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent resize-none"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#166534] focus:border-transparent resize-none"
           placeholder="Please provide as much detail as possible..."
         />
       </div>
@@ -126,7 +126,7 @@ export function SupportForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-4 bg-gradient-to-r from-[#1E3A8A] to-[#1E40AF] text-white rounded-xl font-bold
+        className="w-full py-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white rounded-xl font-bold
                    hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
       >

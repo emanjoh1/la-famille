@@ -41,7 +41,7 @@ export default async function AdminBookingsPage() {
         <StatCard label="Total Bookings" value={bookings.length.toString()} />
         <StatCard label="Confirmed" value={confirmed.length.toString()} color="text-green-600" />
         <StatCard label="Pending" value={pending.length.toString()} color="text-amber-600" />
-        <StatCard label="Revenue" value={`${totalRevenue.toLocaleString()} XAF`} color="text-blue-600" />
+        <StatCard label="Revenue" value={`${totalRevenue.toLocaleString()} XAF`} color="text-emerald-700" />
       </div>
 
       <div className="space-y-8">

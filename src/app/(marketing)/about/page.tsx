@@ -9,7 +9,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 py-20">
+      <div className="bg-gradient-to-br from-green-50 to-emerald-100 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">About La Famille</h1>
           <p className="text-xl text-gray-700 leading-relaxed">
@@ -42,7 +42,7 @@ export default function AboutPage() {
 
         <div className="grid md:grid-cols-4 gap-8 mb-20">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <Heart className="w-8 h-8 text-white" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Community First</h3>
@@ -71,14 +71,14 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-center text-white">
+        <div className="bg-gradient-to-r from-emerald-700 to-emerald-800 rounded-2xl p-12 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
           <p className="text-lg mb-8 opacity-90">
             Whether you're looking for a place to stay or want to become a host, we're here for you.
           </p>
           <Link
             href="/auth"
-            className="inline-block px-8 py-4 bg-white text-blue-600 rounded-xl font-bold hover:shadow-lg transition-all"
+            className="inline-block px-8 py-4 bg-white text-emerald-700 rounded-xl font-bold hover:shadow-lg transition-all"
           >
             Get Started
           </Link>
