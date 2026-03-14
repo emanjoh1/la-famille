@@ -64,10 +64,15 @@ export default function KYCForm() {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 640, height: 480 },
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
       });
       streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute("playsinline", "true");
+        await videoRef.current.play();
+      }
       setCameraActive(true);
     } catch {
       alert("Could not access camera. Please allow camera permissions.");
@@ -81,11 +86,25 @@ export default function KYCForm() {
   }, []);
 
   const captureSelfie = async () => {
-    if (!videoRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Wait until video has real dimensions
+    await new Promise<void>((resolve) => {
+      if (video.videoWidth > 0) { resolve(); return; }
+      video.addEventListener("loadedmetadata", () => resolve(), { once: true });
+    });
+
     const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    // Mirror the image to match the mirrored preview
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0);
+
     canvas.toBlob(async (blob) => {
       if (!blob) return;
       setUploading(true);
@@ -249,7 +268,10 @@ export default function KYCForm() {
           ) : cameraActive ? (
             <div className="space-y-3">
               <div className="relative rounded-xl overflow-hidden bg-black">
-                <video ref={videoRef} autoPlay playsInline muted className="w-full h-64 object-cover scale-x-[-1]" />
+                <video ref={videoRef} autoPlay playsInline muted
+                  className="w-full h-64 object-cover scale-x-[-1]"
+                  style={{ transform: "scaleX(-1)" }}
+                />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="w-48 h-56 border-4 border-white rounded-full opacity-60" />
                 </div>
