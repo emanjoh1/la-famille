@@ -9,9 +9,10 @@ export default async function NewListingPage() {
 
   const kyc = await getKYCStatus(userId);
 
-  if (!kyc || kyc.status !== "approved") {
+  // Block if no KYC submitted or if rejected (must re-submit)
+  if (!kyc || kyc.status === "rejected") {
     redirect("/host/kyc");
   }
 
-  return <NewListingForm />;
+  return <NewListingForm kycPending={kyc.status === "pending"} />;
 }

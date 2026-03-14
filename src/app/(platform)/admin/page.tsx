@@ -1,8 +1,9 @@
 import { getAdminAnalytics } from "@/actions/admin";
+import { getPendingKYCCount } from "@/actions/kyc";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BarChart3, Users, Home, DollarSign, Calendar } from "lucide-react";
+import { BarChart3, Users, Home, DollarSign, Calendar, ShieldCheck } from "lucide-react";
 
 export const metadata = {
   title: "Admin Dashboard | La Famille",
@@ -18,7 +19,10 @@ export default async function AdminPage() {
   const role = user.publicMetadata?.role as string | undefined;
   if (role !== "admin") redirect("/explore");
 
-  const analytics = await getAdminAnalytics();
+  const [analytics, pendingKYC] = await Promise.all([
+    getAdminAnalytics(),
+    getPendingKYCCount(),
+  ]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -90,6 +94,13 @@ export default async function AdminPage() {
           icon={<DollarSign className="w-8 h-8" />}
           title="Financial Reports"
           description="Revenue and commission reports"
+        />
+        <NavCard
+          href="/admin/kyc"
+          icon={<ShieldCheck className="w-8 h-8" />}
+          title="KYC Verification"
+          description="Review host identity submissions"
+          badge={pendingKYC > 0 ? pendingKYC : undefined}
         />
       </div>
     </div>
