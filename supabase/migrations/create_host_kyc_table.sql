@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS host_kyc (
   country TEXT NOT NULL,
   id_card_front_url TEXT NOT NULL,
   id_card_back_url TEXT NOT NULL,
+  selfie_url TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   rejection_reason TEXT,
   submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
