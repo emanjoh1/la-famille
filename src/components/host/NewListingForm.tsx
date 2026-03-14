@@ -38,7 +38,7 @@ type FormField =
   | "max_guests"
   | "price_per_night";
 
-export default function NewListingForm() {
+export default function NewListingForm({ kycPending }: { kycPending?: boolean }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [images, setImages] = useState<string[]>([]);
@@ -243,6 +243,17 @@ export default function NewListingForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-green-50 pb-24">
+      {kycPending && (
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3">
+          <div className="max-w-2xl mx-auto flex items-start gap-3">
+            <Clock className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800">
+              <span className="font-semibold">Identity verification under review.</span>{" "}
+              You can prepare your listing now — it will be submitted for approval once your KYC is approved.
+            </p>
+          </div>
+        </div>
+      )}
       {/* Sticky top progress bar */}
       <div className="sticky top-20 bg-white/95 backdrop-blur-sm border-b border-amber-200 z-40 shadow-sm">
         <div className="max-w-2xl mx-auto px-6 py-4">
