@@ -5,11 +5,7 @@ export async function register() {
     // This prevents build failures in environments like Amplify where
     // some secrets might be missing during the build phase
     if (process.env.NODE_ENV === "production" && !process.env.SKIP_ENV_VALIDATION) {
-      try {
-        validateEnv();
-      } catch (e) {
-        console.warn("Env validation failed:", e);
-      }
+      validateEnv();
     }
   }
 }

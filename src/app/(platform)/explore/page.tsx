@@ -18,17 +18,29 @@ export default async function ExplorePage({
     checkIn?: string;
     checkOut?: string;
     category?: string;
+    page?: string;
   }>;
 }) {
-  const { location, checkIn, checkOut, category } = await searchParams;
+  const { location, checkIn, checkOut, category, page } = await searchParams;
+  const currentPage = Math.max(1, parseInt(page || "1", 10) || 1);
   const hasFilters = !!(location || checkIn || checkOut || category);
-  
-  let allListings = hasFilters 
-    ? await getListings({
-        category: category || undefined,
-        location: location || undefined,
-      })
-    : await getSuggestedListings(12);
+
+  let allListings;
+  let totalCount = 0;
+
+  if (hasFilters) {
+    const result = await getListings({
+      category: category || undefined,
+      location: location || undefined,
+      page: currentPage,
+      limit: 24,
+    });
+    allListings = result.data;
+    totalCount = result.totalCount;
+  } else {
+    allListings = await getSuggestedListings(12);
+    totalCount = allListings.length;
+  }
 
   if (checkIn && checkOut) {
     const { data: bookings } = await supabaseAdmin
@@ -51,7 +63,14 @@ export default async function ExplorePage({
         {!hasFilters ? (
           <LocationBasedListings fallbackListings={listings} />
         ) : (
-          <ExploreContent listings={listings} location={location} hasFilters={hasFilters} />
+          <ExploreContent
+            listings={listings}
+            location={location}
+            hasFilters={hasFilters}
+            currentPage={currentPage}
+            totalCount={totalCount}
+            pageSize={24}
+          />
         )}
       </div>
     </div>

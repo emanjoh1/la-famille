@@ -23,7 +23,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-[60] safe-area-bottom shadow-lg">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-[60] safe-area-bottom shadow-lg" aria-label="Mobile navigation">
       <div className="flex items-center justify-around px-2 py-2">
         {navItems.map(({ href, icon: Icon, labelKey }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
@@ -31,7 +31,8 @@ export function MobileBottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl min-w-[64px] transition-all duration-200 ${
+              aria-current={isActive ? "page" : undefined}
+              className={`flex flex-col items-center justify-center gap-1.5 px-3 py-2 rounded-xl min-w-[64px] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#166534] focus-visible:ring-offset-2 ${
                 isActive
                   ? "text-[#166534] bg-emerald-50"
                   : "text-gray-600 active:bg-gray-100"

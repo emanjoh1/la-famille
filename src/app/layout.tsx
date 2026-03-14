@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/provider";
 import { ProfileCheck } from "@/components/auth/ProfileCheck";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <html lang="fr">
+      <html lang="en">
         <head>
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,8 +52,10 @@ export default function RootLayout({
         </head>
         <body className={`${inter.variable} antialiased touch-manipulation`}>
           <LanguageProvider>
-            <ProfileCheck />
-            {children}
+            <ToastProvider>
+              <ProfileCheck />
+              {children}
+            </ToastProvider>
           </LanguageProvider>
         </body>
       </html>

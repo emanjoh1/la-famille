@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "la-famille",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-H", "127.0.0.1", "-p", "3001"],
+      "port": 3001
     }
   ]
 }

@@ -110,7 +110,7 @@ export default async function ListingDetailPage({
             <h2 className="text-xl font-semibold text-[#222222] mb-1">
               {listing.location}
             </h2>
-            <p className="text-[#717171]">
+            <p className="text-[#595959]">
               <T k="listing.bedrooms" vars={{ count: listing.bedrooms }} /> ·{" "}
               <T k="listing.bathrooms" vars={{ count: listing.bathrooms }} /> ·{" "}
               <T k="listing.guests" vars={{ count: listing.max_guests }} />
@@ -133,7 +133,7 @@ export default async function ListingDetailPage({
                 <p className="font-medium text-[#222222]">
                   <T k="listing.hosted_by" vars={{ name: hostName }} />
                 </p>
-                <p className="text-sm text-[#717171]">
+                <p className="text-sm text-[#595959]">
                   <T k="listing.contact_host" /> →
                 </p>
               </div>

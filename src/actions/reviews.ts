@@ -13,7 +13,7 @@ export async function createReview(data: {
   location_rating: number;
   value_rating: number;
   comment: string;
-}): Promise<{ error: string } | { data: any }> {
+}): Promise<{ error: string } | { data: Record<string, unknown> }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -66,27 +66,33 @@ export async function getListingReviews(listingId: string) {
     return [];
   }
 
+  // Batch-fetch users instead of N+1 individual calls
   const clerk = await clerkClient();
-  const reviewsWithUsers = await Promise.all(
-    (data || []).map(async (review) => {
-      try {
-        const user = await clerk.users.getUser(review.user_id);
-        return {
-          ...review,
-          user_name: user.firstName || "Guest",
-          user_avatar: user.imageUrl,
-        };
-      } catch {
-        return {
-          ...review,
-          user_name: "Guest",
-          user_avatar: null,
-        };
-      }
-    })
-  );
+  const uniqueUserIds = [...new Set((data || []).map((r) => r.user_id))];
 
-  return reviewsWithUsers;
+  const userMap = new Map<string, { name: string; avatar: string | null }>();
+  if (uniqueUserIds.length > 0) {
+    try {
+      const users = await clerk.users.getUserList({ userId: uniqueUserIds, limit: 100 });
+      for (const user of users.data) {
+        userMap.set(user.id, {
+          name: user.firstName || "Guest",
+          avatar: user.imageUrl,
+        });
+      }
+    } catch {
+      // Fall back to empty map — reviews still show with "Guest"
+    }
+  }
+
+  return (data || []).map((review) => {
+    const userData = userMap.get(review.user_id);
+    return {
+      ...review,
+      user_name: userData?.name || "Guest",
+      user_avatar: userData?.avatar || null,
+    };
+  });
 }
 
 export async function getHostReviews(hostId: string) {

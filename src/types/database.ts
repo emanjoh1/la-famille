@@ -79,3 +79,26 @@ export interface Profile {
   created_at: string;
   updated_at: string;
 }
+
+export interface HostKYC {
+  id: string;
+  user_id: string;
+  full_name: string;
+  date_of_birth: string;
+  phone_number: string;
+  address: string;
+  city: string;
+  country: string;
+  id_card_front_url: string;
+  id_card_back_url: string;
+  selfie_url: string;
+  status: "pending" | "approved" | "rejected";
+  rejection_reason?: string | null;
+  submitted_at: string;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+}
+
+export interface BookingWithListing extends Booking {
+  listings: Listing | null;
+}

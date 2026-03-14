@@ -44,10 +44,10 @@ const dictionaries: Record<Locale, Dictionary> = { fr, en };
 const STORAGE_KEY = "la-famille-locale";
 
 function getStoredLocale(): Locale {
-  if (typeof window === "undefined") return "fr";
+  if (typeof window === "undefined") return "en";
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "en" || stored === "fr") return stored;
-  return "fr";
+  return "en";
 }
 
 /**
@@ -109,7 +109,7 @@ interface LanguageProviderProps {
 }
 
 export function LanguageProvider({ children, defaultLocale }: LanguageProviderProps) {
-  const [locale, setLocaleState] = useState<Locale>(defaultLocale ?? "fr");
+  const [locale, setLocaleState] = useState<Locale>(defaultLocale ?? "en");
   const [mounted, setMounted] = useState(false);
 
   // Hydrate from localStorage on mount (client only).
