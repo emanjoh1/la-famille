@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 export async function submitKYC(formData: {
@@ -18,7 +18,7 @@ export async function submitKYC(formData: {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const supabase = createServerSupabaseClient();
+  const supabase = supabaseAdmin;
 
   const { data, error } = await supabase
     .from("host_kyc")
@@ -39,9 +39,7 @@ export async function submitKYC(formData: {
 
 export async function getKYCStatus(userId: string) {
   try {
-    const supabase = createServerSupabaseClient();
-
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("host_kyc")
       .select("*")
       .eq("user_id", userId)
