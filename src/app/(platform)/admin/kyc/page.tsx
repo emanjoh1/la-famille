@@ -2,8 +2,9 @@ import { getAllKYCSubmissionsAdmin } from "@/actions/kyc";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, User, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
 import KYCAdminActions from "../KYCAdminActions";
+import KYCImageViewer from "../KYCImageViewer";
 
 export const metadata = { title: "KYC Verification | Admin" };
 
@@ -132,21 +133,6 @@ function KYCCard({
   return (
     <div className="border border-[#DDDDDD] rounded-2xl p-6">
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Selfie */}
-        <div className="flex-shrink-0">
-          {submission.selfie_url ? (
-            <img
-              src={submission.selfie_url}
-              alt="Selfie"
-              className="w-24 h-24 rounded-xl object-cover border border-[#DDDDDD]"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-xl bg-gray-100 flex items-center justify-center">
-              <User className="w-8 h-8 text-gray-400" />
-            </div>
-          )}
-        </div>
-
         {/* Details */}
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
@@ -164,29 +150,14 @@ function KYCCard({
             <Info label="Address" value={submission.address} />
           </div>
 
-          {/* ID card thumbnails */}
-          <div className="flex gap-3 mb-4">
-            {submission.id_card_front_url && (
-              <a href={submission.id_card_front_url} target="_blank" rel="noopener noreferrer">
-                <img
-                  src={submission.id_card_front_url}
-                  alt="ID Front"
-                  className="h-16 rounded-lg border border-[#DDDDDD] object-cover hover:opacity-80 transition-opacity"
-                />
-                <p className="text-xs text-[#717171] mt-1 text-center">ID Front</p>
-              </a>
-            )}
-            {submission.id_card_back_url && (
-              <a href={submission.id_card_back_url} target="_blank" rel="noopener noreferrer">
-                <img
-                  src={submission.id_card_back_url}
-                  alt="ID Back"
-                  className="h-16 rounded-lg border border-[#DDDDDD] object-cover hover:opacity-80 transition-opacity"
-                />
-                <p className="text-xs text-[#717171] mt-1 text-center">ID Back</p>
-              </a>
-            )}
-          </div>
+          {/* ID card + selfie viewer */}
+          <KYCImageViewer
+            images={[
+              ...(submission.selfie_url ? [{ url: submission.selfie_url, label: "Selfie" }] : []),
+              ...(submission.id_card_front_url ? [{ url: submission.id_card_front_url, label: "ID Front" }] : []),
+              ...(submission.id_card_back_url ? [{ url: submission.id_card_back_url, label: "ID Back" }] : []),
+            ]}
+          />
 
           {submission.rejection_reason && (
             <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2 mb-4">

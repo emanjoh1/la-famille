@@ -153,6 +153,95 @@ export async function unbanUser(userId: string) {
   revalidatePath("/admin/users");
 }
 
+// ─── Hosts Overview ───────────────────────────────────────────
+
+export async function getAllHostsAdmin() {
+  await assertAdmin();
+
+  const clerk = await clerkClient();
+
+  const [listingsData, kycData] = await Promise.all([
+    supabaseAdmin.from("listings").select("*").order("created_at", { ascending: false }),
+    supabaseAdmin.from("host_kyc").select("*"),
+  ]);
+
+  const listings = listingsData.data || [];
+  const kycs = kycData.data || [];
+
+  // Derive host IDs from listings + KYC submissions (source of truth)
+  const hostIds = Array.from(
+    new Set([
+      ...listings.map((l) => l.user_id),
+      ...kycs.map((k) => k.user_id),
+    ])
+  );
+
+  if (hostIds.length === 0) return [];
+
+  // Fetch Clerk profiles for each host id
+  const clerkUsers = await Promise.all(
+    hostIds.map((id) => clerk.users.getUser(id).catch(() => null))
+  );
+
+  return clerkUsers
+    .filter(Boolean)
+    .map((user) => ({
+      id: user!.id,
+      email: user!.emailAddresses[0]?.emailAddress ?? "",
+      firstName: user!.firstName ?? "",
+      lastName: user!.lastName ?? "",
+      imageUrl: user!.imageUrl,
+      createdAt: new Date(user!.createdAt).toISOString(),
+      banned: user!.banned,
+      listings: listings.filter((l) => l.user_id === user!.id),
+      kyc: kycs.find((k) => k.user_id === user!.id) ?? null,
+    }));
+}
+
+// ─── Host Detail ──────────────────────────────────────────────
+
+export async function getHostDetailAdmin(hostId: string) {
+  await assertAdmin();
+
+  const clerk = await clerkClient();
+
+  const [clerkUser, listingsData, kycData] = await Promise.all([
+    clerk.users.getUser(hostId),
+    supabaseAdmin.from("listings").select("*").eq("user_id", hostId).order("created_at", { ascending: false }),
+    supabaseAdmin.from("host_kyc").select("*").eq("user_id", hostId).single(),
+  ]);
+
+  const listings = listingsData.data || [];
+  const listingIds = listings.map((l) => l.id);
+
+  const bookingsData = listingIds.length > 0
+    ? await supabaseAdmin
+        .from("bookings")
+        .select("*")
+        .in("listing_id", listingIds)
+        .order("created_at", { ascending: false })
+    : { data: [] };
+
+  const bookings = bookingsData.data || [];
+
+  return {
+    id: clerkUser.id,
+    email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+    firstName: clerkUser.firstName ?? "",
+    lastName: clerkUser.lastName ?? "",
+    imageUrl: clerkUser.imageUrl,
+    createdAt: new Date(clerkUser.createdAt).toISOString(),
+    banned: clerkUser.banned,
+    kyc: kycData.data ?? null,
+    listings: listings.map((listing) => ({
+      ...listing,
+      bookings: bookings
+        .filter((b) => b.listing_id === listing.id)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+    })),
+  };
+}
+
 // ─── Financial Reports ─────────────────────────────────────────
 
 export async function getFinancialReport(startDate?: string, endDate?: string) {

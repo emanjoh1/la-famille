@@ -3,7 +3,7 @@ import { getPendingKYCCount } from "@/actions/kyc";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BarChart3, Users, Home, DollarSign, Calendar, ShieldCheck } from "lucide-react";
+import { BarChart3, Users, Home, DollarSign, Calendar, ShieldCheck, Building2 } from "lucide-react";
 
 export const metadata = {
   title: "Admin Dashboard | La Famille",
@@ -94,6 +94,12 @@ export default async function AdminPage() {
           icon={<DollarSign className="w-8 h-8" />}
           title="Financial Reports"
           description="Revenue and commission reports"
+        />
+        <NavCard
+          href="/admin/hosts"
+          icon={<Building2 className="w-8 h-8" />}
+          title="Hosts"
+          description="View all hosts, their properties and KYC documents"
         />
         <NavCard
           href="/admin/kyc"
