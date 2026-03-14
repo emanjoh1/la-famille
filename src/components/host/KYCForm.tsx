@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { submitKYC } from "@/actions/kyc";
 import { useUploadThing } from "@/lib/uploadthing";
@@ -61,6 +61,14 @@ export default function KYCForm() {
     }
   };
 
+  // Connect the stream to the video element after it mounts (cameraActive=true renders it)
+  useEffect(() => {
+    if (cameraActive && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [cameraActive]);
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -68,12 +76,7 @@ export default function KYCForm() {
         audio: false,
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute("playsinline", "true");
-        await videoRef.current.play();
-      }
-      setCameraActive(true);
+      setCameraActive(true); // renders the <video> element; useEffect above assigns srcObject
     } catch {
       alert("Could not access camera. Please allow camera permissions.");
     }
