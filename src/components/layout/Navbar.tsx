@@ -28,7 +28,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm">
+    <nav className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20 gap-4">
 
@@ -50,20 +50,23 @@ export function Navbar() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="flex-1 px-5 py-3 text-sm text-gray-900 placeholder-gray-400 rounded-l-full focus:outline-none"
+              aria-label={t("nav.where_to")}
+              className="flex-1 px-5 py-3 text-sm text-gray-900 placeholder-gray-400 rounded-l-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] focus-visible:ring-inset"
             />
             <input
               type="date"
               value={checkIn}
               onChange={(e) => setCheckIn(e.target.value)}
-              className="px-5 py-3 text-sm text-gray-900 focus:outline-none"
+              aria-label="Check-in date"
+              className="px-5 py-3 text-sm text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] focus-visible:ring-inset"
             />
             <input
               type="date"
               value={checkOut}
               min={checkIn}
               onChange={(e) => setCheckOut(e.target.value)}
-              className="px-5 py-3 text-sm text-gray-900 focus:outline-none"
+              aria-label="Check-out date"
+              className="px-5 py-3 text-sm text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] focus-visible:ring-inset"
             />
             <button
               onClick={handleSearch}
@@ -110,6 +113,10 @@ export function Navbar() {
                     onClick={() => setMenuOpen(!menuOpen)}
                     className="flex items-center gap-3 border border-gray-200 rounded-full
                                px-4 py-2 hover:shadow-md transition-all duration-200 bg-white"
+                    aria-expanded={menuOpen}
+                    aria-haspopup="true"
+                    aria-controls="nav-menu"
+                    aria-label="Navigation menu"
                   >
                     <Menu className="w-5 h-5 text-gray-700" />
                     <UserButton afterSignOutUrl="/" />
@@ -123,8 +130,12 @@ export function Navbar() {
                         onClick={() => setMenuOpen(false)}
                       />
                       {/* Dropdown */}
-                      <div className="absolute right-0 top-14 bg-white border border-gray-200
-                                      rounded-2xl shadow-xl py-2 min-w-[240px] z-50">
+                      <div
+                        id="nav-menu"
+                        role="menu"
+                        className="absolute right-0 top-14 bg-white border border-gray-200
+                                      rounded-2xl shadow-xl py-2 min-w-[240px] z-50"
+                      >
                         <Link
                           href="/explore"
                           onClick={() => setMenuOpen(false)}

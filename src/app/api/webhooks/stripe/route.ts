@@ -76,7 +76,8 @@ export async function POST(req: Request) {
 
         // Send confirmation emails
         try {
-          const listing = booking.listings as any
+          const listing = booking.listings as { user_id: string; title: string; location: string } | null
+          if (!listing) throw new Error("Listing data missing from booking")
           const clerk = await clerkClient()
           const [guestUser, hostUser] = await Promise.all([
             clerk.users.getUser(booking.user_id),

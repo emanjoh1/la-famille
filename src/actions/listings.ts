@@ -82,16 +82,24 @@ export async function createListing(formData: FormData): Promise<{ error: string
 
 // ─── Public listing queries ────────────────────────────────────
 
-/** Returns only admin-approved listings, with optional filters */
+/** Returns only admin-approved listings, with optional filters and pagination */
 export async function getListings(filters?: {
   category?: string;
   location?: string;
+  page?: number;
+  limit?: number;
 }) {
+  const page = filters?.page || 1;
+  const limit = filters?.limit || 24;
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   let query = supabaseAdmin
     .from("listings")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("status", "approved")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   if (filters?.category) {
     query = query.eq("category", filters.category);
@@ -101,13 +109,13 @@ export async function getListings(filters?: {
     query = query.ilike("location", `%${filters.location}%`);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
   if (error) {
     console.error("Error fetching listings:", error);
-    return [];
+    return { data: [], totalCount: 0 };
   }
-  return data || [];
+  return { data: data || [], totalCount: count || 0 };
 }
 
 /** Returns a single listing by id (approved or owned by the requester) */

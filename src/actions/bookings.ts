@@ -12,7 +12,7 @@ export async function createBooking(data: {
   check_in: string;
   check_out: string;
   guests: number;
-}): Promise<{ error: string } | { data: any }> {
+}): Promise<{ error: string } | { data: Record<string, unknown> }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -95,7 +95,9 @@ export async function createBooking(data: {
 
   // Create conversation between guest and host
   try {
-    const listingData = result.listings as any;
+    const listingData = result.listings as { user_id: string } | null;
+    if (!listingData) throw new Error("Listing data missing");
+
     const { data: existingConv } = await supabaseAdmin
       .from("conversations")
       .select("id")
@@ -128,7 +130,8 @@ export async function createBooking(data: {
 
   // Send pending reservation emails
   try {
-    const listing = result.listings as any;
+    const listing = result.listings as { user_id: string; title: string; location: string } | null;
+    if (!listing) throw new Error("Listing data missing");
     const clerk = await clerkClient();
     const [guestUser, hostUser] = await Promise.all([
       clerk.users.getUser(userId),
@@ -351,7 +354,7 @@ export async function getUserBookings() {
 export async function updateBookingStatus(
   bookingId: string,
   status: "confirmed" | "cancelled"
-): Promise<{ error: string } | { data: any }> {
+): Promise<{ error: string } | { data: Record<string, unknown> }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 

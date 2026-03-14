@@ -10,6 +10,8 @@ const requiredEnvVars = [
   "UPLOADTHING_SECRET",
   "UPLOADTHING_APP_ID",
   "RESEND_API_KEY",
+  "RESEND_FROM_EMAIL",
+  "NEXT_PUBLIC_APP_URL",
 ] as const;
 
 export function validateEnv() {

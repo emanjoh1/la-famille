@@ -21,18 +21,17 @@ async function assertAdmin() {
 export async function getAdminAnalytics() {
   await assertAdmin();
 
-  const [bookingsData, listingsData, usersData] = await Promise.all([
+  const [bookingsData, listingsData, profilesData, hostData] = await Promise.all([
     supabaseAdmin.from("bookings").select("total_price, status, created_at"),
-    supabaseAdmin.from("listings").select("status, created_at"),
-    (async () => {
-      const clerk = await clerkClient();
-      return clerk.users.getUserList({ limit: 500 });
-    })(),
+    supabaseAdmin.from("listings").select("status, created_at, user_id"),
+    supabaseAdmin.from("profiles").select("id", { count: "exact" }),
+    supabaseAdmin.from("listings").select("user_id"),
   ]);
 
   const bookings = bookingsData.data || [];
   const listings = listingsData.data || [];
-  const users = usersData.data || [];
+  const totalUsers = profilesData.count || 0;
+  const uniqueHosts = new Set((hostData.data || []).map((l) => l.user_id)).size;
 
   // Calculate metrics
   const totalRevenue = bookings
@@ -57,10 +56,10 @@ export async function getAdminAnalytics() {
   };
 
   const userStats = {
-    total: users.length,
-    hosts: users.filter((u) => u.publicMetadata?.role === "host").length,
-    admins: users.filter((u) => u.publicMetadata?.role === "admin").length,
-    guests: users.filter((u) => !u.publicMetadata?.role || u.publicMetadata?.role === "guest").length,
+    total: totalUsers,
+    hosts: uniqueHosts,
+    admins: 1,
+    guests: Math.max(0, totalUsers - uniqueHosts),
   };
 
   return {

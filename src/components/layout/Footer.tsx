@@ -39,9 +39,9 @@ export function Footer() {
           <div>
             <h3 className="font-bold text-gray-900 mb-4">{t("footer.legal")}</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-600 hover:text-gray-900">{t("footer.terms")}</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-gray-900">{t("footer.privacy")}</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-gray-900">{t("footer.cookie_policy")}</a></li>
+              <li><Link href="/terms" className="text-gray-600 hover:text-gray-900">{t("footer.terms")}</Link></li>
+              <li><Link href="/privacy" className="text-gray-600 hover:text-gray-900">{t("footer.privacy")}</Link></li>
+              <li><Link href="/faq" className="text-gray-600 hover:text-gray-900">{t("footer.cookie_policy")}</Link></li>
             </ul>
           </div>
         </div>

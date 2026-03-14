@@ -68,8 +68,6 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bookingId: result.data.id,
-          listingTitle: `Booking for ${nights} night${nights !== 1 ? "s" : ""}`,
-          totalPrice: total,
         }),
       });
 
@@ -113,10 +111,11 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
       <div className="border border-gray-200 rounded-xl overflow-hidden mb-4 hover:border-gray-300 transition-colors">
         <div className="grid grid-cols-2 divide-x divide-gray-200">
           <div className="p-3 hover:bg-gray-50 transition-colors">
-            <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
+            <label htmlFor="booking-checkin" className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
               {t("booking.check_in")}
             </label>
             <input
+              id="booking-checkin"
               type="date"
               value={checkIn}
               min={today}
@@ -125,16 +124,17 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setError(null);
                 if (checkOut && e.target.value >= checkOut) setCheckOut("");
               }}
-              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
+              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] cursor-pointer"
               style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' } as React.CSSProperties}
               required
             />
           </div>
           <div className="p-3 hover:bg-gray-50 transition-colors">
-            <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
+            <label htmlFor="booking-checkout" className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
               {t("booking.check_out")}
             </label>
             <input
+              id="booking-checkout"
               type="date"
               value={checkOut}
               min={checkIn || today}
@@ -142,7 +142,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
                 setCheckOut(e.target.value);
                 setError(null);
               }}
-              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
+              className="w-full text-sm text-gray-900 bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] cursor-pointer"
               style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' } as React.CSSProperties}
               required
               disabled={!checkIn}
@@ -150,13 +150,14 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
           </div>
         </div>
         <div className="border-t border-gray-200 p-3 hover:bg-gray-50 transition-colors">
-          <label className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
+          <label htmlFor="booking-guests" className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-1.5 block">
             {t("booking.guests")}
           </label>
           <select
+            id="booking-guests"
             value={guests}
             onChange={(e) => setGuests(Number(e.target.value))}
-            className="w-full text-sm text-gray-900 bg-transparent focus:outline-none cursor-pointer"
+            className="w-full text-sm text-gray-900 bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534] cursor-pointer"
           >
             {Array.from({ length: listing.max_guests }, (_, i) => i + 1).map(
               (n) => (
