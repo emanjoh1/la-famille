@@ -76,7 +76,6 @@ export async function getMessages(conversationId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // Verify user is part of this conversation
   await verifyConversationAccess(conversationId, userId);
 
   const { data, error } = await supabaseAdmin
@@ -86,7 +85,33 @@ export async function getMessages(conversationId: string) {
     .order("created_at", { ascending: true });
 
   if (error) throw new Error(error.message || "Failed to load messages");
+
+  // Mark unread messages from the other party as read
+  const unreadIds = (data ?? []).filter(m => m.sender_id !== userId && !m.read_at).map(m => m.id);
+  if (unreadIds.length > 0) {
+    await supabaseAdmin
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", unreadIds);
+  }
+
   return data;
+}
+
+export async function markMessagesRead(conversationId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  await verifyConversationAccess(conversationId, userId);
+
+  await supabaseAdmin
+    .from("messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", userId)
+    .is("read_at", null);
+
+  revalidatePath(`/messages/${conversationId}`);
 }
 
 export async function getUserConversations() {

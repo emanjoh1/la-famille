@@ -25,7 +25,7 @@ export default function HostDashboardClient({ data }: { data: any }) {
     : "—";
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-3xl font-semibold text-[#222222] mb-2">Host Dashboard</h1>
       <p className="text-[#717171] mb-8">Manage your bookings, pricing and availability</p>
 
@@ -38,20 +38,22 @@ export default function HostDashboardClient({ data }: { data: any }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[#DDDDDD] mb-8 overflow-x-auto">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors -mb-px whitespace-nowrap
-              ${tab === id
-                ? "border-[#222222] text-[#222222]"
-                : "border-transparent text-[#717171] hover:text-[#222222]"}`}
-          >
-            <Icon className="w-4 h-4" />
-            {label}
-          </button>
-        ))}
+      <div className="relative mb-8">
+        <div className="flex gap-1 overflow-x-auto border-b border-[#DDDDDD] scrollbar-none">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0
+                ${tab === id
+                  ? "border-[#222222] text-[#222222]"
+                  : "border-transparent text-[#717171] hover:text-[#222222]"}`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {tab === "active"   && <BookingsPanel inProgress={data.inProgress} upcoming={data.upcoming} />}

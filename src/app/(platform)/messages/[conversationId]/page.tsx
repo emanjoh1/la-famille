@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   getConversation,
   getMessages,
@@ -10,7 +10,7 @@ import {
 } from "@/actions/messages";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, ArrowLeft, Check, CheckCheck } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import type { Message, Conversation } from "@/types/database";
 import { useLanguageContext } from "@/lib/i18n/provider";
@@ -21,6 +21,7 @@ interface ConversationWithListing extends Conversation {
 
 export default function ConversationPage() {
   const params = useParams();
+  const router = useRouter();
   const conversationId = params.conversationId as string;
   const { userId } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -31,9 +32,7 @@ export default function ConversationPage() {
   const { t } = useLanguageContext();
 
   useEffect(() => {
-    if (conversationId) {
-      loadData();
-    }
+    if (conversationId) loadData();
   }, [conversationId]);
 
   useEffect(() => {
@@ -41,7 +40,6 @@ export default function ConversationPage() {
   }, [messages]);
 
   const loadData = async () => {
-    if (!conversationId) return;
     try {
       const [conv, msgs, allConvs] = await Promise.all([
         getConversation(conversationId),
@@ -50,126 +48,109 @@ export default function ConversationPage() {
       ]);
       setConversation(conv);
       setMessages(msgs);
-      setConversations(allConvs.map(c => {
-        const listing = Array.isArray(c.listings) ? c.listings[0] : c.listings;
-        return {
-          id: c.id,
-          listing_id: c.listing_id,
-          host_id: c.host_id,
-          guest_id: c.guest_id,
-          created_at: c.created_at,
-          listings: listing
-        };
-      }));
-    } catch (error) {
-      console.error("Failed to load conversation:", error);
+      setConversations(allConvs.map(c => ({
+        id: c.id,
+        listing_id: c.listing_id,
+        host_id: c.host_id,
+        guest_id: c.guest_id,
+        created_at: c.created_at,
+        listings: Array.isArray(c.listings) ? c.listings[0] : c.listings,
+      })));
+    } catch {
       setTimeout(() => loadData(), 1000);
     }
   };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !conversationId) return;
+    if (!content.trim()) return;
     const result = await sendMessage(conversationId, content);
-    if ("error" in result) {
-      console.error("Send message error:", result.error);
-      return;
-    }
+    if ("error" in result) return;
     setContent("");
     loadData();
   };
 
   if (!conversation) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-6 h-[600px] flex items-center justify-center">
-        <div className="text-[#717171]">{t("common.loading")}</div>
+      <div className="flex items-center justify-center h-[60vh] text-[#717171]">
+        {t("common.loading")}
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
-      <h1 className="text-3xl font-semibold text-[#222222] mb-6">{t("nav.messages")}</h1>
+    <div className="max-w-7xl mx-auto md:px-6 md:py-6">
+      {/* Desktop heading — hidden on mobile */}
+      <h1 className="hidden md:block text-3xl font-semibold text-[#222222] mb-6">
+        {t("nav.messages")}
+      </h1>
 
       <div
-        className="flex border border-[#DDDDDD] rounded-2xl overflow-hidden"
-        style={{ height: "calc(100vh - 240px)", minHeight: "500px" }}
+        className="flex md:border md:border-[#DDDDDD] md:rounded-2xl overflow-hidden"
+        style={{ height: "calc(100dvh - 130px)", minHeight: "500px" }}
       >
-        {/* Left sidebar */}
-        <div className="w-80 lg:w-96 border-r border-[#DDDDDD] flex-shrink-0 overflow-y-auto">
-          {conversations.map((conv) => (
-            <Link
-              key={conv.id}
-              href={`/messages/${conv.id}`}
-              className={`flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD]
-                          hover:bg-[#F7F7F7] transition-colors
-                          ${conv.id === conversationId ? "bg-[#F7F7F7]" : ""}`}
-            >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">H</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p
-                  className={`truncate text-sm ${
-                    conv.id === conversationId
-                      ? "font-semibold text-[#222222]"
-                      : "font-medium text-[#222222]"
-                  }`}
-                >
-                  {conv.listings?.title}
-                </p>
-                <p className="text-xs text-[#717171] truncate">
-                  {conv.listings?.location}
-                </p>
-              </div>
-            </Link>
-          ))}
+        {/* Sidebar — hidden on mobile when in a conversation */}
+        <div className="hidden md:flex w-80 lg:w-96 border-r border-[#DDDDDD] flex-shrink-0 flex-col overflow-y-auto">
+          <SidebarList conversations={conversations} activeId={conversationId} />
         </div>
 
-        {/* Right: Message thread */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Thread header */}
-          <div className="px-6 py-4 border-b border-[#DDDDDD] flex-shrink-0">
-            <p className="font-semibold text-[#222222]">
-              {conversation.listings?.title}
-            </p>
-            <p className="text-sm text-[#717171]">
-              {conversation.listings?.location}
-            </p>
+        {/* Chat panel — full screen on mobile */}
+        <div className="flex-1 flex flex-col min-w-0 w-full">
+          {/* Header */}
+          <div className="px-4 md:px-6 py-3 md:py-4 border-b border-[#DDDDDD] flex items-center gap-3 flex-shrink-0">
+            {/* Back arrow on mobile */}
+            <button
+              onClick={() => router.push("/messages")}
+              className="md:hidden p-1 -ml-1 text-[#222222]"
+              aria-label="Back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">H</span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-[#222222] truncate text-sm">
+                {conversation.listings?.title}
+              </p>
+              <p className="text-xs text-[#717171] truncate">
+                {conversation.listings?.location}
+              </p>
+            </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-3">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <MessageCircle className="w-10 h-10 text-[#DDDDDD] mb-3" />
                 <p className="text-[#717171] text-sm">{t("messages.no_messages")}</p>
               </div>
             )}
-            {messages.map((msg) => {
+            {messages.map((msg, i) => {
               const isOwn = msg.sender_id === userId;
+              // Show receipt only on the last own message
+              const isLastOwn = isOwn && !messages.slice(i + 1).some(m => m.sender_id === userId);
               return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
-                >
-                  <div className="max-w-[70%]">
-                    <div
-                      className={`px-4 py-2.5 rounded-2xl text-sm ${
-                        isOwn
-                          ? "bg-[#166534] text-white rounded-br-sm"
-                          : "bg-[#F7F7F7] text-[#222222] rounded-bl-sm"
-                      }`}
-                    >
+                <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+                  <div className="max-w-[80%] md:max-w-[70%]">
+                    <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                      isOwn
+                        ? "bg-[#166534] text-white rounded-br-sm"
+                        : "bg-[#F7F7F7] text-[#222222] rounded-bl-sm"
+                    }`}>
                       {msg.content}
                     </div>
-                    <p
-                      className={`text-xs text-[#717171] mt-1 ${
-                        isOwn ? "text-right" : "text-left"
-                      }`}
-                    >
-                      {format(new Date(msg.created_at), "MMM d, HH:mm")}
-                    </p>
+                    <div className={`flex items-center gap-1 mt-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                      <p className="text-xs text-[#717171]">
+                        {format(new Date(msg.created_at), "MMM d, HH:mm")}
+                      </p>
+                      {isLastOwn && (
+                        msg.read_at
+                          ? <CheckCheck className="w-3.5 h-3.5 text-[#166534]" />
+                          : <Check className="w-3.5 h-3.5 text-[#717171]" />
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -177,24 +158,24 @@ export default function ConversationPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message input */}
+          {/* Input */}
           <form
             onSubmit={handleSend}
-            className="px-6 py-4 border-t border-[#DDDDDD] flex items-center gap-3 flex-shrink-0"
+            className="px-4 md:px-6 py-3 md:py-4 border-t border-[#DDDDDD] flex items-center gap-2 flex-shrink-0 bg-white"
           >
             <input
               type="text"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={t("messages.type_message")}
-              className="flex-1 px-5 py-3 border border-[#DDDDDD] rounded-full text-sm
+              className="flex-1 px-4 py-2.5 border border-[#DDDDDD] rounded-full text-sm
                          text-[#222222] placeholder-[#717171] focus:outline-none
                          focus:border-[#222222] transition-colors"
             />
             <button
               type="submit"
               disabled={!content.trim()}
-              className="p-3 bg-[#166534] text-white rounded-full hover:bg-[#15803D]
+              className="p-2.5 bg-[#166534] text-white rounded-full hover:bg-[#15803D]
                          disabled:bg-[#DDDDDD] transition-colors flex-shrink-0"
               aria-label={t("messages.send")}
             >
@@ -204,5 +185,29 @@ export default function ConversationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SidebarList({ conversations, activeId }: { conversations: ConversationWithListing[]; activeId: string }) {
+  return (
+    <>
+      {conversations.map((conv) => (
+        <Link
+          key={conv.id}
+          href={`/messages/${conv.id}`}
+          className={`flex items-center gap-4 px-5 py-4 border-b border-[#DDDDDD] hover:bg-[#F7F7F7] transition-colors ${conv.id === activeId ? "bg-[#F7F7F7]" : ""}`}
+        >
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-200 to-emerald-400 flex-shrink-0 flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">H</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`truncate text-sm ${conv.id === activeId ? "font-semibold" : "font-medium"} text-[#222222]`}>
+              {conv.listings?.title}
+            </p>
+            <p className="text-xs text-[#717171] truncate">{conv.listings?.location}</p>
+          </div>
+        </Link>
+      ))}
+    </>
   );
 }

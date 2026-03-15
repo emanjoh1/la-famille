@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Loader2, Mail, Lock, User } from "lucide-react";
 
-type Mode = "sign-in" | "sign-up" | "verify";
+type Mode = "sign-in" | "sign-up" | "verify" | "reset" | "reset-verify";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<Mode>("sign-in");
@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"google" | "facebook" | null>(null);
@@ -45,6 +46,33 @@ export default function AuthPage() {
       setError(e.errors?.[0]?.message ?? "OAuth failed. Please try again.");
       setOauthLoading(null);
     }
+  };
+
+  const handleResetRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!signInLoaded) return;
+    setLoading(true); setError("");
+    try {
+      await signIn.create({ strategy: "reset_password_email_code", identifier: email });
+      setMode("reset-verify");
+    } catch (e: any) {
+      setError(e.errors?.[0]?.longMessage ?? e.errors?.[0]?.message ?? "Could not send reset email.");
+    } finally { setLoading(false); }
+  };
+
+  const handleResetVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!signInLoaded) return;
+    setLoading(true); setError("");
+    try {
+      const result = await signIn.attemptFirstFactor({ strategy: "reset_password_email_code", code, password: newPassword });
+      if (result.status === "complete") {
+        await (window as any).Clerk?.setActive({ session: result.createdSessionId });
+        router.push("/explore");
+      }
+    } catch (e: any) {
+      setError(e.errors?.[0]?.longMessage ?? e.errors?.[0]?.message ?? "Reset failed.");
+    } finally { setLoading(false); }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -116,6 +144,61 @@ export default function AuthPage() {
           </span>
         </div>
 
+        {/* Reset password — enter email */}
+        {mode === "reset" && (
+          <>
+            <h1 className="text-2xl font-semibold text-[#222222] mb-1">Reset password</h1>
+            <p className="text-sm text-[#717171] mb-6">Enter your email and we'll send you a reset code.</p>
+            <form onSubmit={handleResetRequest} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#717171]" />
+                <input type="email" placeholder="Email address" value={email}
+                  onChange={(e) => setEmail(e.target.value)} required
+                  className={`${inputClass} pl-10`} />
+              </div>
+              {error && <p className="text-xs text-red-600">{error}</p>}
+              <button type="submit" disabled={loading}
+                className="w-full py-3 bg-[#166534] text-white rounded-xl font-semibold text-sm hover:bg-[#15803D] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Send reset code
+              </button>
+            </form>
+            <button onClick={() => { setMode("sign-in"); setError(""); }} className="mt-4 text-xs text-[#717171] hover:text-[#222222] w-full text-center">← Back to sign in</button>
+          </>
+        )}
+
+        {/* Reset password — enter code + new password */}
+        {mode === "reset-verify" && (
+          <>
+            <h1 className="text-2xl font-semibold text-[#222222] mb-1">Set new password</h1>
+            <p className="text-sm text-[#717171] mb-6">Enter the code sent to <span className="font-medium text-[#222222]">{email}</span> and choose a new password.</p>
+            <form onSubmit={handleResetVerify} className="space-y-4">
+              <input type="text" inputMode="numeric" maxLength={6} value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                className={`${inputClass} text-center text-2xl tracking-[0.5em] font-semibold`}
+                autoFocus />
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#717171]" />
+                <input type={showPassword ? "text" : "password"} placeholder="New password"
+                  value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required
+                  className={`${inputClass} pl-10 pr-10`} />
+                <button type="button" onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#717171] hover:text-[#222222]">
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {error && <p className="text-xs text-red-600">{error}</p>}
+              <button type="submit" disabled={loading || code.length < 6 || !newPassword}
+                className="w-full py-3 bg-[#166534] text-white rounded-xl font-semibold text-sm hover:bg-[#15803D] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Reset password
+              </button>
+            </form>
+            <button onClick={() => { setMode("reset"); setError(""); }} className="mt-4 text-xs text-[#717171] hover:text-[#222222] w-full text-center">← Back</button>
+          </>
+        )}
+
         {/* Verify email */}
         {mode === "verify" && (
           <>
@@ -148,7 +231,7 @@ export default function AuthPage() {
         )}
 
         {/* Sign in / Sign up */}
-        {mode !== "verify" && (
+        {(mode === "sign-in" || mode === "sign-up") && (
           <>
             <h1 className="text-2xl font-semibold text-[#222222] mb-1">
               {mode === "sign-in" ? "Welcome back" : "Create account"}
@@ -245,7 +328,16 @@ export default function AuthPage() {
               </button>
             </form>
 
-            <p className="text-sm text-center text-[#717171] mt-6">
+            {mode === "sign-in" && (
+              <p className="text-sm text-center mt-3">
+                <button onClick={() => { setMode("reset"); setError(""); }}
+                  className="text-[#717171] hover:text-[#222222] hover:underline text-xs">
+                  Forgot password?
+                </button>
+              </p>
+            )}
+
+            <p className="text-sm text-center text-[#717171] mt-4">
               {mode === "sign-in" ? "Don't have an account? " : "Already have an account? "}
               <button
                 onClick={() => { setMode(mode === "sign-in" ? "sign-up" : "sign-in"); setError(""); }}
