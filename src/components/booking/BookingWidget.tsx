@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Star, AlertCircle } from "lucide-react";
+import { Star, AlertCircle, Smartphone, CreditCard } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 import { differenceInDays } from "date-fns";
 import { createBooking } from "@/actions/bookings";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const [guests, setGuests] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"mobilemoney" | "card">("mobilemoney");
   const { t } = useLanguageContext();
 
   const today = new Date().toISOString().split("T")[0];
@@ -62,20 +64,23 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         return;
       }
 
-      // Create Stripe checkout session
-      const response = await fetch("/api/bookings/create-checkout", {
+      // Create payment session based on selected method
+      const endpoint =
+        paymentMethod === "mobilemoney"
+          ? "/api/bookings/create-flutterwave-payment"
+          : "/api/bookings/create-checkout";
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingId: result.data.id,
-        }),
+        body: JSON.stringify({ bookingId: result.data.id }),
       });
 
       const { url } = await response.json();
       if (url) {
-        window.location.href = url; // Redirect to Stripe checkout
+        window.location.href = url;
       } else {
-        throw new Error("Failed to create checkout session");
+        throw new Error("Failed to create payment session");
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
@@ -177,6 +182,43 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
+
+      {/* Payment method selector */}
+      <div className="mb-4">
+        <p className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">
+          Payment method
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("mobilemoney")}
+            className={cn(
+              "flex flex-col items-center gap-1 p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-150",
+              paymentMethod === "mobilemoney"
+                ? "border-[#166534] bg-emerald-50 text-[#166534]"
+                : "border-gray-200 text-gray-600 hover:border-gray-300"
+            )}
+          >
+            <Smartphone className="w-5 h-5" />
+            <span>Mobile Money</span>
+            <span className="text-xs font-normal text-gray-500">MTN · Orange</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaymentMethod("card")}
+            className={cn(
+              "flex flex-col items-center gap-1 p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-150",
+              paymentMethod === "card"
+                ? "border-[#166534] bg-emerald-50 text-[#166534]"
+                : "border-gray-200 text-gray-600 hover:border-gray-300"
+            )}
+          >
+            <CreditCard className="w-5 h-5" />
+            <span>Card</span>
+            <span className="text-xs font-normal text-gray-500">Visa · Mastercard</span>
+          </button>
+        </div>
+      </div>
 
       {/* Reserve button */}
       <button
