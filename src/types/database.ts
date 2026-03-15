@@ -29,6 +29,8 @@ export interface Booking {
   status: "pending" | "confirmed" | "cancelled";
   payment_status?: string;
   stripe_payment_intent_id?: string;
+  flutterwave_transaction_id?: string;
+  payment_provider?: "stripe" | "flutterwave";
   created_at: string;
   updated_at?: string;
 }

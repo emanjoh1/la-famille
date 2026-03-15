@@ -8,7 +8,17 @@ const nextConfig: NextConfig = {
   },
   allowedDevOrigins: ["*", "*.replit.dev", "*.janeway.replit.dev"],
   images: {
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [256, 384, 512, 768, 1024],
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "ysbkgkrmxqzkhwogdlnq.supabase.co",
+      },
       {
         protocol: "https",
         hostname: "img.clerk.com",
@@ -30,10 +40,6 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
@@ -45,11 +51,6 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value:
               "camera=(self), microphone=(), geolocation=(), browsing-topics=()",
-          },
-          {
-            key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://js.stripe.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://clerk.com https://*.clerk.accounts.dev https://api.stripe.com https://uploadthing.com https://*.uploadthing.com https://api.uploadthing.com https://*.ufs.sh; frame-src https://js.stripe.com https://clerk.com https://*.clerk.accounts.dev https://challenges.cloudflare.com https://www.google.com https://maps.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },

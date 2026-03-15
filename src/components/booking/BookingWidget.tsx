@@ -6,6 +6,7 @@ import { differenceInDays } from "date-fns";
 import { createBooking } from "@/actions/bookings";
 import { useRouter } from "next/navigation";
 import { useLanguageContext } from "@/lib/i18n/provider";
+import { FlutterwaveInline } from "./FlutterwaveInline";
 
 interface BookingWidgetProps {
   listing: {
@@ -22,6 +23,7 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
   const [guests, setGuests] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
   const { t } = useLanguageContext();
 
   const today = new Date().toISOString().split("T")[0];
@@ -38,55 +40,26 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
 
   const handleReserve = async () => {
     setError(null);
-    if (!checkIn || !checkOut) {
-      setError(t("booking.select_dates"));
-      return;
-    }
-    if (nights === 0) {
-      setError(t("booking.checkout_after_checkin"));
-      return;
-    }
+    if (!checkIn || !checkOut) { setError(t("booking.select_dates")); return; }
+    if (nights === 0) { setError(t("booking.checkout_after_checkin")); return; }
     setLoading(true);
     try {
-      // Create booking
       const result = await createBooking({
         listing_id: listing.id,
         check_in: checkIn,
         check_out: checkOut,
         guests,
       });
-
-      if ("error" in result) {
-        setError(result.error);
-        setLoading(false);
-        return;
-      }
-
-      // Create Stripe checkout session
-      const response = await fetch("/api/bookings/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingId: result.data.id,
-        }),
-      });
-
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url; // Redirect to Stripe checkout
-      } else {
-        throw new Error("Failed to create checkout session");
-      }
+      if ("error" in result) { setError(result.error); return; }
+      setPendingBookingId(result.data.id as string);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
-
-      // If unauthorized, redirect to login
       if (msg === "Unauthorized") {
         router.push("/auth?redirect=" + encodeURIComponent(window.location.pathname));
         return;
       }
-
       setError(msg);
+    } finally {
       setLoading(false);
     }
   };
@@ -170,6 +143,33 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         </div>
       </div>
 
+      {/* Price breakdown */}
+      <div className="space-y-3 pt-4 border-t border-gray-200 mb-4">
+        {nights > 0 ? (
+          <>
+            <div className="flex justify-between text-gray-900 text-sm">
+              <span className="underline decoration-gray-400">
+                {listing.price_per_night.toLocaleString()} XAF × {nights} {nights !== 1 ? t("common.nights") : t("common.night")}
+              </span>
+              <span className="font-semibold">{subtotal.toLocaleString()} XAF</span>
+            </div>
+            <div className="flex justify-between text-gray-900 text-sm">
+              <span className="underline decoration-gray-400">{t("booking.service_fee_label")}</span>
+              <span className="font-semibold">{serviceFee.toLocaleString()} XAF</span>
+            </div>
+            <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-900 text-base">
+              <span>{t("booking.total_before_taxes")}</span>
+              <span>{total.toLocaleString()} XAF</span>
+            </div>
+          </>
+        ) : (
+          <div className="flex justify-between text-gray-500 text-sm">
+            <span className="underline decoration-gray-400">{t("booking.service_fee_label")}</span>
+            <span>14%</span>
+          </div>
+        )}
+      </div>
+
       {/* Error message */}
       {error && (
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
@@ -178,39 +178,31 @@ export function BookingWidget({ listing }: BookingWidgetProps) {
         </div>
       )}
 
-      {/* Reserve button */}
-      <button
-        onClick={handleReserve}
-        disabled={loading}
-        className="w-full py-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white
-                   font-bold text-base rounded-xl hover:from-[#15803D] hover:to-[#D97706]
-                   transition-all duration-200 mb-4 disabled:opacity-60 disabled:cursor-not-allowed
-                   shadow-md hover:shadow-lg hover:scale-[1.02]"
-      >
-        {loading ? t("booking.reserving") : t("booking.reserve")}
-      </button>
-      <p className="text-center text-sm text-gray-600 mb-4">
-        {t("booking.no_charge_yet")}
-      </p>
-
-      {/* Price breakdown */}
-      {nights > 0 && (
-        <div className="space-y-3 pt-4 border-t border-gray-200">
-          <div className="flex justify-between text-gray-900 text-sm">
-            <span className="underline decoration-gray-400">
-              {listing.price_per_night.toLocaleString()} XAF × {nights} {nights !== 1 ? t("common.nights") : t("common.night")}
-            </span>
-            <span className="font-semibold">{subtotal.toLocaleString()} XAF</span>
-          </div>
-          <div className="flex justify-between text-gray-900 text-sm">
-            <span className="underline decoration-gray-400">{t("booking.service_fee_label")}</span>
-            <span className="font-semibold">{serviceFee.toLocaleString()} XAF</span>
-          </div>
-          <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-900 text-base">
-            <span>{t("booking.total_before_taxes")}</span>
-            <span>{total.toLocaleString()} XAF</span>
-          </div>
-        </div>
+      {/* Step 1: Reserve — Step 2: Pay inline */}
+      {!pendingBookingId ? (
+        <>
+          <button
+            onClick={handleReserve}
+            disabled={loading}
+            className="w-full py-4 bg-gradient-to-r from-[#166534] to-[#15803D] text-white
+                       font-bold text-base rounded-xl hover:from-[#15803D] hover:to-[#D97706]
+                       transition-all duration-200 mb-4 disabled:opacity-60 disabled:cursor-not-allowed
+                       shadow-md hover:shadow-lg hover:scale-[1.02]"
+          >
+            {loading ? t("booking.reserving") : t("booking.reserve")}
+          </button>
+          <p className="text-center text-sm text-gray-600">
+            {t("booking.no_charge_yet")}
+          </p>
+        </>
+      ) : (
+        <FlutterwaveInline
+          bookingId={pendingBookingId}
+          label="Pay Now"
+          className="w-full py-4 justify-center text-base"
+          onSuccess={() => router.push("/bookings?flw_status=success")}
+          onClose={() => setPendingBookingId(null)}
+        />
       )}
     </div>
   );

@@ -1,13 +1,53 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Home, Shield, Heart, Star, MapPin, Users, Sparkles } from "lucide-react";
 import { POPULAR_CITIES } from "@/lib/utils/constants";
 import { SearchBar } from "@/components/home/SearchBar";
 import { useDict } from "@/lib/i18n/use-dict";
+import { useEffect, useState } from "react";
+
+const HERO_IMAGES = [
+  {
+    url: "https://images.pexels.com/photos/3889843/pexels-photo-3889843.jpeg?auto=compress&cs=tinysrgb&w=1920",
+    label: "African Culture",
+  },
+  {
+    url: "https://images.pexels.com/photos/1770775/pexels-photo-1770775.jpeg?auto=compress&cs=tinysrgb&w=1920",
+    label: "African Market",
+  },
+  {
+    url: "https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1920",
+    label: "Cameroon Coast",
+  },
+  {
+    url: "https://images.pexels.com/photos/4388164/pexels-photo-4388164.jpeg?auto=compress&cs=tinysrgb&w=1920",
+    label: "Cameroon Landscape",
+  },
+];
+
+const CITY_IMAGES: Record<string, string> = {
+  Douala: "https://images.pexels.com/photos/3889843/pexels-photo-3889843.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Yaoundé: "https://images.pexels.com/photos/1770775/pexels-photo-1770775.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Bamenda: "https://images.pexels.com/photos/4388164/pexels-photo-4388164.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Buea: "https://images.pexels.com/photos/3225517/pexels-photo-3225517.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Limbe: "https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Kribi: "https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Bafoussam: "https://images.pexels.com/photos/1770775/pexels-photo-1770775.jpeg?auto=compress&cs=tinysrgb&w=400",
+  Garoua: "https://images.pexels.com/photos/3889843/pexels-photo-3889843.jpeg?auto=compress&cs=tinysrgb&w=400",
+};
 
 export function HomePageContent({ today }: { today: string }) {
   const { t } = useDict();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((i) => (i + 1) % HERO_IMAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -34,28 +74,59 @@ export function HomePageContent({ today }: { today: string }) {
 
       <main>
         {/* Hero Section */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-amber-50 to-yellow-50 opacity-70" />
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(22, 101, 52, 0.12) 0%, transparent 50%),
-                             radial-gradient(circle at 80% 80%, rgba(217, 119, 6, 0.12) 0%, transparent 50%)`
-          }} />
-
-          <div className="relative max-w-7xl mx-auto px-6 pt-32 pb-20">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 mb-6 shadow-sm">
-                <Sparkles className="w-4 h-4 text-[#166534]" />
-                <span className="text-sm font-semibold text-gray-900">{t("hero.title")}</span>
-              </div>
-              <h2 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-6">
-                {t("hero.title")}
-              </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                {t("hero.subtitle")}
-              </p>
+        <div className="relative h-screen min-h-[600px] overflow-hidden">
+          {/* Slideshow images */}
+          {HERO_IMAGES.map((img, i) => (
+            <div
+              key={img.url}
+              className="absolute inset-0 transition-opacity duration-1000"
+              style={{ opacity: i === current ? 1 : 0 }}
+            >
+              <Image
+                src={img.url}
+                alt={img.label}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                quality={100}
+                priority={i === 0}
+                unoptimized
+              />
             </div>
+          ))}
 
-            <SearchBar today={today} />
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-32 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            {HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Hero content */}
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm
+                            rounded-full border border-white/20 mb-6">
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span className="text-sm font-semibold text-white">Cameroon · Africa</span>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-bold text-white leading-tight mb-6 drop-shadow-lg">
+              {t("hero.title")}
+            </h2>
+            <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-12">
+              {t("hero.subtitle")}
+            </p>
+            <div className="w-full max-w-4xl">
+              <SearchBar today={today} />
+            </div>
           </div>
         </div>
 
@@ -89,24 +160,28 @@ export function HomePageContent({ today }: { today: string }) {
             <h3 className="text-4xl font-bold text-gray-900 mb-4">{t("common.explore_cameroon")}</h3>
             <p className="text-lg text-gray-600">{t("common.popular_destinations")}</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {POPULAR_CITIES.slice(0, 8).map((city) => (
               <Link
                 key={city.name}
-                href="/auth"
-                className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200
-                           hover:shadow-xl hover:scale-105 transition-all duration-300"
+                href={`/auth`}
+                className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
               >
-                <div className="aspect-square bg-gradient-to-br from-green-100 via-amber-100 to-yellow-100 p-6 flex items-center justify-center">
-                  <span className="text-6xl group-hover:scale-110 transition-transform duration-300">🏙️</span>
-                </div>
-                <div className="p-4">
-                  <p className="font-bold text-gray-900 mb-1">{city.name}</p>
-                  <p className="text-sm text-gray-600">Cameroon</p>
-                </div>
-                <div className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full
-                               flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
-                  <MapPin className="w-4 h-4 text-[#166534]" />
+                <Image
+                  src={CITY_IMAGES[city.name] ?? "https://images.pexels.com/photos/3889843/pexels-photo-3889843.jpeg?auto=compress&cs=tinysrgb&w=400"}
+                  alt={city.name}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  quality={90}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="font-bold text-white text-lg leading-tight">{city.name}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <MapPin className="w-3 h-3 text-white/70" />
+                    <p className="text-xs text-white/70">Cameroon</p>
+                  </div>
                 </div>
               </Link>
             ))}

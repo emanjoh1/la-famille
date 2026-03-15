@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ListingCard } from "./ListingCard";
-import { MapPin, Loader2, X } from "lucide-react";
+import { X, MapPin } from "lucide-react";
 
 interface Listing {
   id: string;
@@ -112,25 +112,6 @@ export function LocationBasedListings({ fallbackListings }: { fallbackListings: 
           </div>
         </div>
       )}
-
-      <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-orange-50 rounded-full mb-4">
-          {loading ? (
-            <Loader2 className="w-4 h-4 text-[#166534] animate-spin" />
-          ) : (
-            <MapPin className="w-4 h-4 text-[#166534]" />
-          )}
-          <span className="text-sm font-semibold text-gray-900">
-            {loading ? "Finding stays near you..." : userLocation ? `Near ${userLocation}` : "Suggested for you"}
-          </span>
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {userLocation ? `Stays Near You` : "Discover Amazing Stays"}
-        </h1>
-        <p className="text-gray-600">
-          {userLocation ? `Properties in ${userLocation}` : "Handpicked properties across Cameroon"}
-        </p>
-      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {listings.map((listing) => (

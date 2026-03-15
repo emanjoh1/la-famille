@@ -4,7 +4,16 @@ import { auth } from "@clerk/nextjs/server";
 const f = createUploadthing();
 
 export const ourFileRouter = {
-  listingImages: f({ image: { maxFileSize: "4MB", maxFileCount: 10 } })
+  heroImages: f({ image: { maxFileSize: "16MB", maxFileCount: 20 } })
+    .middleware(async () => {
+      const { userId } = await auth();
+      if (!userId) throw new Error("Unauthorized");
+      return { userId };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      return { uploadedBy: metadata.userId, url: file.url };
+    }),
+  listingImages: f({ image: { maxFileSize: "8MB", maxFileCount: 10 } })
     .middleware(async () => {
       const { userId } = await auth();
       if (!userId) throw new Error("Unauthorized");
