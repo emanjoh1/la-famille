@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Globe, Menu, Search, ArrowLeftRight } from "lucide-react";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useLanguageContext } from "@/lib/i18n/provider";
@@ -15,6 +15,7 @@ export function Navbar() {
   const [isHost, setIsHost] = useState(false);
   const [mode, setMode] = useState<"guest" | "host">("guest");
   const { user } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
   const pathname = usePathname();
   const isAdmin = (user?.publicMetadata?.role as string) === "admin";
@@ -172,7 +173,13 @@ export function Navbar() {
                     aria-label="Navigation menu"
                   >
                     <Menu className="w-5 h-5 text-gray-700" />
-                    <UserButton afterSignOutUrl="/" />
+                    <div className="w-8 h-8 rounded-full bg-[#222222] flex items-center justify-center text-white text-sm font-semibold overflow-hidden">
+                      {user?.imageUrl ? (
+                        <img src={user.imageUrl} alt="avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0]?.toUpperCase() ?? "?"}</span>
+                      )}
+                    </div>
                   </button>
 
                   {menuOpen && (
@@ -279,6 +286,14 @@ export function Navbar() {
                         >
                           <Globe className="w-4 h-4" />
                           {locale === "fr" ? "English" : "Français"}
+                        </button>
+
+                        <div className="border-t border-gray-200 my-2" />
+                        <button
+                          onClick={() => { setMenuOpen(false); signOut({ redirectUrl: "/" }); }}
+                          className="w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Sign out
                         </button>
                       </div>
                     </>
