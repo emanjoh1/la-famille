@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CategoryBar } from "@/components/listings/CategoryBar";
 import { LocationBasedListings } from "@/components/listings/LocationBasedListings";
 import { ExploreContent } from "@/components/explore/ExploreContent";
+import { ExploreBanner } from "@/components/explore/ExploreBanner";
 
 export const metadata = {
   title: "Explore Properties | La Famille",
@@ -58,6 +59,7 @@ export default async function ExplorePage({
 
   return (
     <div>
+      <ExploreBanner />
       <CategoryBar />
       <div className="max-w-7xl mx-auto px-6 py-8">
         {!hasFilters ? (

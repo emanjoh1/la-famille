@@ -102,7 +102,7 @@ export default async function BookingsPage() {
               </Link>
               <div className="flex flex-col gap-2">
                 {booking.status === "pending" && (
-                  <BookingActions bookingId={booking.id} />
+                  <BookingActions bookingId={booking.id} paymentStatus={booking.payment_status} />
                 )}
                 {booking.canReview && (
                   <Link

@@ -3,7 +3,7 @@ import { getPendingKYCCount } from "@/actions/kyc";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BarChart3, Users, Home, DollarSign, Calendar, ShieldCheck, Building2 } from "lucide-react";
+import { BarChart3, Users, Home, DollarSign, Calendar, ShieldCheck, Building2, ImageIcon } from "lucide-react";
 
 export const metadata = {
   title: "Admin Dashboard | La Famille",
@@ -107,6 +107,12 @@ export default async function AdminPage() {
           title="KYC Verification"
           description="Review host identity submissions"
           badge={pendingKYC > 0 ? pendingKYC : undefined}
+        />
+        <NavCard
+          href="/admin/images"
+          icon={<ImageIcon className="w-8 h-8" />}
+          title="Site Images"
+          description="Manage hero slideshow and city card photos"
         />
       </div>
     </div>
