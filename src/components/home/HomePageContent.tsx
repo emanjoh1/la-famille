@@ -5,14 +5,54 @@ import { Home, Shield, Heart, Star, MapPin, Users, Sparkles } from "lucide-react
 import { POPULAR_CITIES } from "@/lib/utils/constants";
 import { SearchBar } from "@/components/home/SearchBar";
 import { useDict } from "@/lib/i18n/use-dict";
+import { motion, type Variants } from "framer-motion";
+import { useState, useEffect } from "react";
+
+const cardVariant: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+const destinationVariant: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+const destinationStagger: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+};
 
 export function HomePageContent({ today }: { today: string }) {
   const { t } = useDict();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  const headingWords = t("hero.title").split(" ");
 
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm">
+      <motion.nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${
+          scrolled
+            ? "bg-white/97 border-gray-200 shadow-[0_4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md"
+            : "bg-white/90 border-transparent shadow-sm backdrop-blur-sm"
+        }`}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 bg-gradient-to-br from-[#166534] to-[#15803D] rounded-xl flex items-center justify-center shadow-md">
@@ -30,38 +70,89 @@ export function HomePageContent({ today }: { today: string }) {
             {t("common.sign_up")}
           </Link>
         </div>
-      </nav>
+      </motion.nav>
 
       <main>
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-amber-50 to-yellow-50 opacity-70" />
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(22, 101, 52, 0.12) 0%, transparent 50%),
-                             radial-gradient(circle at 80% 80%, rgba(217, 119, 6, 0.12) 0%, transparent 50%)`
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(circle at 20% 50%, rgba(22, 101, 52, 0.12) 0%, transparent 50%),
+                               radial-gradient(circle at 80% 80%, rgba(217, 119, 6, 0.12) 0%, transparent 50%)`,
+            }}
+          />
 
           <div className="relative max-w-7xl mx-auto px-6 pt-32 pb-20">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 mb-6 shadow-sm">
+              {/* Badge */}
+              <motion.div
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 mb-6 shadow-sm"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
                 <Sparkles className="w-4 h-4 text-[#166534]" />
                 <span className="text-sm font-semibold text-gray-900">{t("hero.title")}</span>
-              </div>
-              <h2 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-6">
-                {t("hero.title")}
-              </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              </motion.div>
+
+              {/* Heading — staggered word reveal */}
+              <motion.h2
+                className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-6"
+                initial="hidden"
+                animate="visible"
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+              >
+                {headingWords.map((word, i) => (
+                  <motion.span
+                    key={i}
+                    className="inline-block mr-[0.25em]"
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+                      },
+                    }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </motion.h2>
+
+              {/* Subtitle */}
+              <motion.p
+                className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+              >
                 {t("hero.subtitle")}
-              </p>
+              </motion.p>
             </div>
 
-            <SearchBar today={today} />
+            {/* SearchBar */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+            >
+              <SearchBar today={today} />
+            </motion.div>
           </div>
         </div>
 
         {/* Features Section */}
         <section className="max-w-7xl mx-auto px-6 py-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+          >
             <FeatureCard
               icon={<Shield className="w-8 h-8" />}
               title={t("common.verified")}
@@ -80,46 +171,78 @@ export function HomePageContent({ today }: { today: string }) {
               description={t("common.best_price_desc")}
               color="from-amber-500 to-orange-500"
             />
-          </div>
+          </motion.div>
         </section>
 
         {/* Popular Destinations */}
         <section className="max-w-7xl mx-auto px-6 py-20 bg-gradient-to-b from-white to-gray-50">
-          <div className="text-center mb-12">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <h3 className="text-4xl font-bold text-gray-900 mb-4">{t("common.explore_cameroon")}</h3>
             <p className="text-lg text-gray-600">{t("common.popular_destinations")}</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
+            variants={destinationStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+          >
             {POPULAR_CITIES.slice(0, 8).map((city) => (
-              <Link
+              <motion.div
                 key={city.name}
-                href="/auth"
-                className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200
-                           hover:shadow-xl hover:scale-105 transition-all duration-300"
+                variants={destinationVariant}
+                whileHover={{
+                  scale: 1.03,
+                  transition: { type: "spring", stiffness: 300, damping: 20 },
+                }}
               >
-                <div className="aspect-square bg-gradient-to-br from-green-100 via-amber-100 to-yellow-100 p-6 flex items-center justify-center">
-                  <span className="text-6xl group-hover:scale-110 transition-transform duration-300">🏙️</span>
-                </div>
-                <div className="p-4">
-                  <p className="font-bold text-gray-900 mb-1">{city.name}</p>
-                  <p className="text-sm text-gray-600">Cameroon</p>
-                </div>
-                <div className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full
-                               flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
-                  <MapPin className="w-4 h-4 text-[#166534]" />
-                </div>
-              </Link>
+                <Link
+                  href="/auth"
+                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200
+                             hover:shadow-xl transition-shadow duration-300 block"
+                >
+                  <div className="aspect-square bg-gradient-to-br from-green-100 via-amber-100 to-yellow-100 p-6 flex items-center justify-center">
+                    <span className="text-6xl group-hover:scale-110 transition-transform duration-300">🏙️</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="font-bold text-gray-900 mb-1">{city.name}</p>
+                    <p className="text-sm text-gray-600">Cameroon</p>
+                  </div>
+                  <div
+                    className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full
+                               flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                  >
+                    <MapPin className="w-4 h-4 text-[#166534]" />
+                  </div>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         {/* CTA Section */}
-        <section className="relative overflow-hidden bg-gradient-to-r from-[#166534] to-[#15803D] text-white">
+        <motion.section
+          className="relative overflow-hidden bg-gradient-to-r from-[#166534] to-[#15803D] text-white"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%),
-                               radial-gradient(circle at 70% 50%, white 0%, transparent 50%)`
-            }} />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(circle at 30% 50%, white 0%, transparent 50%),
+                                 radial-gradient(circle at 70% 50%, white 0%, transparent 50%)`,
+              }}
+            />
           </div>
           <div className="relative max-w-4xl mx-auto px-6 py-20 text-center">
             <Users className="w-16 h-16 mx-auto mb-6 opacity-90" />
@@ -133,7 +256,7 @@ export function HomePageContent({ today }: { today: string }) {
               {t("common.sign_up")}
             </Link>
           </div>
-        </section>
+        </motion.section>
 
         {/* Footer */}
         <footer className="bg-gray-50 border-t border-gray-200">
@@ -188,22 +311,35 @@ export function HomePageContent({ today }: { today: string }) {
   );
 }
 
-function FeatureCard({ icon, title, description, color }: {
+function FeatureCard({
+  icon,
+  title,
+  description,
+  color,
+}: {
   icon: React.ReactNode;
   title: string;
   description: string;
   color: string;
 }) {
   return (
-    <div className="group p-8 bg-white rounded-2xl border border-gray-200 hover:shadow-xl hover:border-gray-300 transition-all duration-300">
-      <div className={`w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center mb-6
-                      group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-        <div className="text-white">
-          {icon}
-        </div>
+    <motion.div
+      variants={cardVariant}
+      whileHover={{
+        y: -4,
+        boxShadow: "0 20px 40px rgba(0,0,0,0.10)",
+        transition: { type: "spring", stiffness: 300, damping: 20 },
+      }}
+      className="group p-8 bg-white rounded-2xl border border-gray-200 cursor-default"
+    >
+      <div
+        className={`w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center mb-6
+                    group-hover:scale-110 transition-transform duration-300 shadow-md`}
+      >
+        <div className="text-white">{icon}</div>
       </div>
       <h4 className="text-xl font-bold text-gray-900 mb-3">{title}</h4>
       <p className="text-gray-600 leading-relaxed">{description}</p>
-    </div>
+    </motion.div>
   );
 }

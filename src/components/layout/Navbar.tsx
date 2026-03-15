@@ -5,6 +5,7 @@ import { Globe, Menu, Search, ArrowLeftRight } from "lucide-react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguageContext } from "@/lib/i18n/provider";
 
 export function Navbar() {
@@ -59,9 +60,21 @@ export function Navbar() {
   };
 
   const isHostMode = mode === "host";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   return (
-    <nav className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 shadow-sm" aria-label="Main navigation">
+    <nav
+      className={`sticky top-0 bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 transition-shadow duration-300 ${
+        scrolled ? "shadow-md" : "shadow-sm"
+      }`}
+      aria-label="Main navigation"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20 gap-4">
 
@@ -182,13 +195,18 @@ export function Navbar() {
                     </div>
                   </button>
 
+                  <AnimatePresence>
                   {menuOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                      <div
+                      <motion.div
                         id="nav-menu"
                         role="menu"
                         className="absolute right-0 top-14 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 min-w-[240px] z-50"
+                        initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                        transition={{ duration: 0.18, ease: "easeOut" }}
                       >
                         {/* Mode switcher at top */}
                         {isHost && (
@@ -295,9 +313,10 @@ export function Navbar() {
                         >
                           Sign out
                         </button>
-                      </div>
+                      </motion.div>
                     </>
                   )}
+                  </AnimatePresence>
                 </div>
               </>
             )}
