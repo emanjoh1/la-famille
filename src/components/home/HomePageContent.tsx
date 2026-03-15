@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Shield, Heart, Star, MapPin, Users, Sparkles } from "lucide-react";
+import { Home, Shield, Heart, Star, MapPin, Users } from "lucide-react";
 import { POPULAR_CITIES } from "@/lib/utils/constants";
 import { SearchBar } from "@/components/home/SearchBar";
 import { useDict } from "@/lib/i18n/use-dict";
 import { motion, type Variants } from "framer-motion";
 import { useState, useEffect } from "react";
+import { HeroGeometric } from "@/components/ui/shape-landing-hero";
 
 const cardVariant: Variants = {
   hidden: { opacity: 0, y: 32 },
@@ -37,8 +38,6 @@ export function HomePageContent({ today }: { today: string }) {
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
-
-  const headingWords = t("hero.title").split(" ");
 
   return (
     <div className="min-h-screen bg-white">
@@ -74,75 +73,21 @@ export function HomePageContent({ today }: { today: string }) {
 
       <main>
         {/* Hero Section */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-amber-50 to-yellow-50 opacity-70" />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(circle at 20% 50%, rgba(22, 101, 52, 0.12) 0%, transparent 50%),
-                               radial-gradient(circle at 80% 80%, rgba(217, 119, 6, 0.12) 0%, transparent 50%)`,
-            }}
-          />
+        <HeroGeometric
+          badge="La Famille · Cameroon"
+          title1="Find Your Perfect"
+          title2="Home Away From Home"
+        />
 
-          <div className="relative max-w-7xl mx-auto px-6 pt-32 pb-20">
-            <div className="text-center mb-12">
-              {/* Badge */}
-              <motion.div
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full border border-gray-200 mb-6 shadow-sm"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              >
-                <Sparkles className="w-4 h-4 text-[#166534]" />
-                <span className="text-sm font-semibold text-gray-900">{t("hero.title")}</span>
-              </motion.div>
-
-              {/* Heading — staggered word reveal */}
-              <motion.h2
-                className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight mb-6"
-                initial="hidden"
-                animate="visible"
-                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
-              >
-                {headingWords.map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block mr-[0.25em]"
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      visible: {
-                        opacity: 1,
-                        y: 0,
-                        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-                      },
-                    }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
-              </motion.h2>
-
-              {/* Subtitle */}
-              <motion.p
-                className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
-              >
-                {t("hero.subtitle")}
-              </motion.p>
-            </div>
-
-            {/* SearchBar */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-            >
-              <SearchBar today={today} />
-            </motion.div>
-          </div>
-        </div>
+        {/* SearchBar — overlaps bottom of hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+          className="max-w-7xl mx-auto px-6 py-12 -mt-20 relative z-10"
+        >
+          <SearchBar today={today} />
+        </motion.div>
 
         {/* Features Section */}
         <section className="max-w-7xl mx-auto px-6 py-20">
