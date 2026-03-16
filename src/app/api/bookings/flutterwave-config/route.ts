@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     amount: booking.total_price,
     currency: "XAF",
     language: "en",
-    customer: { email: `booking+${booking.id.slice(0, 8)}@lafamille.cm`, name },
+    customer: { email, name },
     payment_options: "card,account,mobilemoneycameroon,ussd,banktransfer",
     meta: { booking_id: booking.id },
     customizations: {
