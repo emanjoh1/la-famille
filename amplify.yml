@@ -19,6 +19,9 @@ frontend:
         - env | grep -e UPLOADTHING_APP_ID >> .env.production || true
         - env | grep -e RESEND_API_KEY >> .env.production
         - env | grep -e RESEND_FROM_EMAIL >> .env.production
+        - env | grep -e FLW_PUBLIC_KEY >> .env.production
+        - env | grep -e FLW_SECRET_KEY >> .env.production
+        - env | grep -e FLUTTERWAVE_SECRET_HASH >> .env.production || true
         - npm run build
   artifacts:
     baseDirectory: .next
