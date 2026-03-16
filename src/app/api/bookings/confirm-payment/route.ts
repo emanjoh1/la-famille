@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
 
   // Send confirmation emails
   try {
-    const listing = booking.listings as { title: string; location: string; user_id: string } | null;
+    const listingRaw = Array.isArray(booking.listings) ? booking.listings[0] : booking.listings;
+    const listing = listingRaw as unknown as { title: string; location: string; user_id: string } | null;
     if (listing) {
       const clerk = await clerkClient();
       const [guestUser, hostUser] = await Promise.all([
