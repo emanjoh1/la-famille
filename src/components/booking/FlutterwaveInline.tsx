@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/cn";
 
 declare global {
   interface Window {
-    FlutterwaveCheckout: (config: Record<string, unknown>) => { close: () => void };
+    FlutterwaveCheckout?: (config: Record<string, unknown>) => { close: () => void };
   }
 }
 
@@ -69,7 +69,7 @@ export function FlutterwaveInline({
 
       setLoading(false);
 
-      window.FlutterwaveCheckout({
+      window.FlutterwaveCheckout!({
         ...config,
         redirect_url: undefined,
         callback: async (response: { status: string; transaction_id: number }) => {
